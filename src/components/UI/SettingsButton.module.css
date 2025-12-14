@@ -1,0 +1,30 @@
+.settingsButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background-color: transparent;
+  color: var(--color-text);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 4px;
+}
+
+.settingsButton:hover {
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+}
+
+.settingsButton:active {
+  transform: scale(0.95);
+}
+
+@media (min-width: 768px) {
+  .settingsButton {
+    width: 44px;
+    height: 44px;
+  }
+}

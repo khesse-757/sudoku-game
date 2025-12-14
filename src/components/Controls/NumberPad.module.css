@@ -1,20 +1,28 @@
 .numberPad {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1rem;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  margin-top: 1rem;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Desktop: 3x3 + action buttons */
+.desktopPad {
+  display: none;
 }
 
 .numbers {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+/* Base button styles */
 .numberButton {
   aspect-ratio: 1;
   padding: 1rem;
@@ -25,21 +33,27 @@
   font-size: 1.5rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 4px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .numberButton:hover:not(:disabled) {
   background-color: var(--color-primary);
   color: var(--color-background);
-  box-shadow: 0 0 10px var(--color-primary);
-  transform: scale(1.05);
+  border-color: var(--color-primary);
+  transform: scale(1.02);
 }
 
 .numberButton:active:not(:disabled) {
-  transform: scale(0.95);
+  transform: scale(0.98);
+}
+
+.numberButton:focus {
+  outline: none;
 }
 
 .numberButton:disabled {
@@ -47,78 +61,192 @@
   cursor: not-allowed;
 }
 
-.clearButton {
-  padding: 0.75rem;
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  border: 2px solid var(--color-border);
-  font-family: var(--font-family);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s;
+/* Toggle button (Notes) - can be ON or OFF */
+.toggleButton {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.clearButton:hover:not(:disabled) {
+.toggleButton:focus {
+  outline: none;
+}
+
+.toggleButton.active {
+  background-color: var(--color-primary) !important;
+  color: var(--color-background) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.toggleButton:not(.active) {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Action button (Erase) - just does an action, not a toggle */
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.actionButton:focus {
+  outline: none;
+}
+
+.actionButton:hover:not(:disabled) {
   background-color: var(--color-error);
   color: var(--color-background);
   border-color: var(--color-error);
-  box-shadow: 0 0 10px var(--color-error);
+  transform: scale(1.02);
 }
 
-.clearButton:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
+.actionButton span,
+.toggleButton span {
+  display: none;
 }
 
-@media (max-width: 768px) {
-  .numberPad {
-    padding: 0.75rem;
+/* Mobile: 2 rows */
+.mobilePad {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mobileRow {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+}
+
+.mobileRow:first-child {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+/* Remove hover effects on touch devices */
+@media (hover: none) {
+  .numberButton:hover:not(:disabled) {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+    transform: none;
   }
-  
+
+  .toggleButton.active:hover {
+    background-color: var(--color-primary) !important;
+    color: var(--color-background) !important;
+    border-color: var(--color-primary) !important;
+  }
+
+  .actionButton:hover:not(:disabled) {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+    transform: none;
+  }
+}
+
+/* Desktop breakpoint */
+@media (min-width: 768px) {
+  .desktopPad {
+    display: block;
+  }
+
+  .mobilePad {
+    display: none;
+  }
+
+  .actionButton span,
+  .toggleButton span {
+    display: inline;
+  }
+
+  .numbers {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .actions {
+    gap: 0.75rem;
+  }
+
+  .numberButton {
+    padding: 1.25rem;
+    font-size: 1.75rem;
+    border-radius: 6px;
+  }
+
+  .actionButton,
+  .toggleButton {
+    aspect-ratio: auto;
+    padding: 1rem 1.5rem;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+  .numberPad {
+    max-width: 500px;
+  }
+
+  .numbers {
+    gap: 1rem;
+  }
+
+  .actions {
+    gap: 1rem;
+  }
+
+  .numberButton {
+    font-size: 2rem;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 400px) {
+  .mobilePad {
+    gap: 0.4rem;
+  }
+
+  .mobileRow {
+    gap: 0.4rem;
+  }
+
   .numberButton {
     padding: 0.75rem;
     font-size: 1.25rem;
+    border-radius: 3px;
   }
-  
-  .clearButton {
+}
+
+/* Landscape mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+  .numberButton {
     padding: 0.6rem;
-    font-size: 0.875rem;
+    font-size: 1.2rem;
   }
-}
 
-.modeButton {
-  padding: 0.75rem;
-  background-color: var(--color-surface);
-  color: var(--color-text);
-  border: 2px solid var(--color-border);
-  font-family: var(--font-family);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+  .mobilePad {
+    gap: 0.4rem;
+  }
 
-.modeButton:hover {
-  background-color: var(--color-primary);
-  color: var(--color-background);
-  border-color: var(--color-primary);
-  box-shadow: 0 0 10px var(--color-primary);
-}
-
-.modeButton.active {
-  background-color: var(--color-primary);
-  color: var(--color-background);
-  border-color: var(--color-primary);
-  font-weight: 700;
+  .mobileRow {
+    gap: 0.4rem;
+  }
 }

@@ -1,6 +1,6 @@
 // Core game types
 export type Difficulty = 'easy' | 'medium' | 'hard';
-export type ThemeName = 'green' | 'amber' | 'paper' | 'monochrome';
+export type ThemeName = 'green' | 'amber' | 'paper' | 'monochrome' | 'clean';
 export type FontFamily = 'jetbrains' | 'fira' | 'ibm' | 'courier';
 
 export interface Cell {

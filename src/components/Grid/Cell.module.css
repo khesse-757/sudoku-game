@@ -76,13 +76,31 @@
   align-items: center;
   justify-content: center;
   font-size: clamp(0.4rem, 0.8vw, 0.6rem);
-  color: var(--color-text-dim);
+  font-weight: 600;
   line-height: 1;
   overflow: hidden;
 }
 
+.noteActive {
+  color: var(--color-text);
+  opacity: 0.9;
+}
+
 .noteInactive {
   opacity: 0;
+}
+
+/* Better contrast for notes in selected cells */
+.cell.selected .noteActive {
+  color: var(--color-background);
+  opacity: 1;
+}
+
+/* Better contrast for notes in highlighted cells */
+.cell.highlighted .noteActive {
+  color: var(--color-text);
+  opacity: 1;
+  font-weight: 700;
 }
 
 @media (prefers-reduced-motion: reduce) {

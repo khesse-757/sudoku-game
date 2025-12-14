@@ -1,5 +1,5 @@
 import { useStore } from '../../store';
-import { Eraser, Pencil } from 'lucide-react';
+import { Eraser, Edit3 } from 'lucide-react';
 import styles from './NumberPad.module.css';
 
 interface NumberPadProps {
@@ -28,37 +28,85 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
     clearCell();
   };
 
+  const handleTogglePencilMode = () => {
+    setIsPencilMode(!isPencilMode);
+  };
+
   return (
     <div className={styles.numberPad}>
-      <div className={styles.numbers}>
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+      {/* Desktop: 3x3 grid with buttons */}
+      <div className={styles.desktopPad}>
+        <div className={styles.numbers}>
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+            <button
+              key={num}
+              onClick={() => handleNumberClick(num)}
+              className={styles.numberButton}
+              disabled={!selectedCell}
+            >
+              {num}
+            </button>
+          ))}
+        </div>
+        <div className={styles.actions}>
           <button
-            key={num}
-            onClick={() => handleNumberClick(num)}
-            onMouseDown={(e) => e.preventDefault()}
-            className={styles.numberButton}
+            onClick={handleTogglePencilMode}
+            className={`${styles.toggleButton} ${isPencilMode ? styles.active : ''}`}
+          >
+            <Edit3 size={20} />
+            <span>Notes</span>
+          </button>
+          <button
+            onClick={handleClear}
+            className={styles.actionButton}
             disabled={!selectedCell}
           >
-            {num}
+            <Eraser size={20} />
+            <span>Erase</span>
           </button>
-        ))}
+        </div>
       </div>
-      <button
-        onClick={() => setIsPencilMode(!isPencilMode)}
-        className={`${styles.modeButton} ${isPencilMode ? styles.active : ''}`}
-      >
-        <Pencil size={20} />
-        <span>Notes {isPencilMode ? 'ON' : 'OFF'}</span>
-      </button>
-      <button
-        onClick={handleClear}
-        onMouseDown={(e) => e.preventDefault()}
-        className={styles.clearButton}
-        disabled={!selectedCell}
-      >
-        <Eraser size={20} />
-        <span>Clear</span>
-      </button>
+
+      {/* Mobile: 2 rows (1-5, 6-9 + actions) */}
+      <div className={styles.mobilePad}>
+        <div className={styles.mobileRow}>
+          {[1, 2, 3, 4, 5].map((num) => (
+            <button
+              key={num}
+              onClick={() => handleNumberClick(num)}
+              className={styles.numberButton}
+              disabled={!selectedCell}
+            >
+              {num}
+            </button>
+          ))}
+        </div>
+        <div className={styles.mobileRow}>
+          {[6, 7, 8, 9].map((num) => (
+            <button
+              key={num}
+              onClick={() => handleNumberClick(num)}
+              className={styles.numberButton}
+              disabled={!selectedCell}
+            >
+              {num}
+            </button>
+          ))}
+          <button
+            onClick={handleTogglePencilMode}
+            className={`${styles.numberButton} ${styles.toggleButton} ${isPencilMode ? styles.active : ''}`}
+          >
+            <Edit3 size={18} />
+          </button>
+          <button
+            onClick={handleClear}
+            className={`${styles.numberButton} ${styles.actionButton}`}
+            disabled={!selectedCell}
+          >
+            <Eraser size={18} />
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

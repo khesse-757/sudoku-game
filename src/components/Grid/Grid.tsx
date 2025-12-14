@@ -10,7 +10,7 @@ const Grid = () => {
   return (
     <div className={styles.gridContainer}>
       <div className={styles.grid}>
-        {userGrid.map((row, rowIndex) => (
+        {userGrid.map((row, rowIndex) =>
           row.map((cell, colIndex) => (
             <Cell
               key={`${rowIndex}-${colIndex}`}
@@ -18,14 +18,16 @@ const Grid = () => {
               notes={cell.notes}
               isGiven={cell.isGiven}
               isSelected={
-                selectedCell?.[0] === rowIndex && selectedCell?.[1] === colIndex
+                selectedCell !== null &&
+                selectedCell[0] === rowIndex &&
+                selectedCell[1] === colIndex
               }
               row={rowIndex}
               col={colIndex}
               onClick={() => selectCell(rowIndex, colIndex)}
             />
           ))
-        ))}
+        )}
       </div>
     </div>
   );

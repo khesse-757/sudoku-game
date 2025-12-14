@@ -2,21 +2,33 @@ import { useEffect, useState } from 'react';
 import { useStore } from '../../store';
 import { THEMES, FONTS } from '../../utils/constants';
 import { useKeyboard } from '../../hooks/useKeyboard';
-import GameControls from '../Controls/GameControls';
-import Timer from '../Controls/Timer';
 import NumberPad from '../Controls/NumberPad';
-import UndoRedo from '../Controls/UndoRedo';
-import ThemeSwitcher from '../UI/ThemeSwitcher';
 import VictoryModal from '../UI/VictoryModal';
-import StatsPanel from '../UI/StatsPanel';
+import SettingsButton from '../UI/SettingsButton';
 import Grid from '../Grid/Grid';
+import { Play, Pause } from 'lucide-react';
 import styles from './GameLayout.module.css';
 
 const GameLayout = () => {
   const theme = useStore((state) => state.settings.theme);
   const font = useStore((state) => state.settings.font);
+  const difficulty = useStore((state) => state.game.difficulty);
+  const timer = useStore((state) => state.game.timer);
+  const isPaused = useStore((state) => state.game.isPaused);
   const startNewGame = useStore((state) => state.startNewGame);
+  const incrementTimer = useStore((state) => state.incrementTimer);
+  const pauseGame = useStore((state) => state.pauseGame);
+  const resumeGame = useStore((state) => state.resumeGame);
   const [isPencilMode, setIsPencilMode] = useState(false);
+
+  // Timer tick
+  useEffect(() => {
+    const interval = setInterval(() => {
+      incrementTimer();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [incrementTimer]);
 
   // Apply theme on mount and when theme changes
   useEffect(() => {
@@ -51,33 +63,77 @@ const GameLayout = () => {
 
   useKeyboard(isPencilMode, setIsPencilMode);
 
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const togglePause = () => {
+    if (isPaused) {
+      resumeGame();
+    } else {
+      pauseGame();
+    }
+  };
+
   return (
     <div className={styles.layout}>
       <VictoryModal />
       
       <header className={styles.header}>
-        <h1 className={styles.title}>
-          <span className="terminal-glow">SUDOKU.TERMINAL</span>
-        </h1>
+        <SettingsButton />
+        <h1 className={styles.title}>SUDOKU.TERMINAL</h1>
+        <div className={styles.spacer}></div>
       </header>
       
       <main className={styles.main}>
-        <div className={styles.gameArea}>
-          <ThemeSwitcher />
-          <StatsPanel />
-          <Timer />
-          <UndoRedo />
-          <GameControls />
-          <Grid />
-          <NumberPad isPencilMode={isPencilMode} setIsPencilMode={setIsPencilMode} />
+        {/* Mobile: Stacked layout */}
+        <div className={styles.mobileLayout}>
+          <div className={styles.gameInfoBar}>
+            <span className={styles.difficulty}>{difficulty.toUpperCase()}</span>
+            <div className={styles.timerSection}>
+              <button 
+                onClick={togglePause}
+                className={styles.pauseButton}
+                aria-label={isPaused ? 'Resume' : 'Pause'}
+              >
+                {isPaused ? <Play size={16} /> : <Pause size={16} />}
+              </button>
+              <span className={styles.timer}>{formatTime(timer)}</span>
+            </div>
+          </div>
+          <div className={styles.gridContainer}>
+            <Grid />
+          </div>
+          <div className={styles.controls}>
+            <NumberPad isPencilMode={isPencilMode} setIsPencilMode={setIsPencilMode} />
+          </div>
+        </div>
+
+        {/* Desktop: Side-by-side layout */}
+        <div className={styles.desktopLayout}>
+          <div className={styles.gridSection}>
+            <div className={styles.gameInfoBar}>
+              <span className={styles.difficulty}>{difficulty.toUpperCase()}</span>
+              <div className={styles.timerSection}>
+                <button 
+                  onClick={togglePause}
+                  className={styles.pauseButton}
+                  aria-label={isPaused ? 'Resume' : 'Pause'}
+                >
+                  {isPaused ? <Play size={18} /> : <Pause size={18} />}
+                </button>
+                <span className={styles.timer}>{formatTime(timer)}</span>
+              </div>
+            </div>
+            <Grid />
+          </div>
+          <div className={styles.numberPadSection}>
+            <NumberPad isPencilMode={isPencilMode} setIsPencilMode={setIsPencilMode} />
+          </div>
         </div>
       </main>
-
-      <footer className={styles.footer}>
-        <p className={styles.footerText}>
-          Arrow keys to navigate • 1-9 to enter • N for notes • Ctrl+Z to undo
-        </p>
-      </footer>
     </div>
   );
 };

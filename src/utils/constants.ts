@@ -70,6 +70,18 @@ export const THEMES = {
     error: '#ffffff',
     success: '#ffffff',
     border: '#666666'
+  },
+  clean: {
+    name: 'Clean',
+    primary: '#007aff',
+    secondary: '#0051a8',
+    background: '#ffffff',
+    surface: '#f8f9fa',
+    text: '#1a1a1a',
+    textDim: '#6c757d',
+    error: '#dc3545',
+    success: '#28a745',
+    border: '#dee2e6'
   }
 } as const;
 

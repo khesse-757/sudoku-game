@@ -8,6 +8,7 @@ const ThemeSwitcher = () => {
   const setTheme = useStore((state) => state.setTheme);
 
   const themes: { name: ThemeName; label: string }[] = [
+    { name: 'clean', label: 'Clean' },
     { name: 'green', label: 'Green' },
     { name: 'amber', label: 'Amber' },
     { name: 'paper', label: 'Paper' },
