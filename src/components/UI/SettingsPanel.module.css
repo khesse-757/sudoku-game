@@ -23,8 +23,8 @@
   top: 0;
   left: 0;
   bottom: 0;
-  width: 320px;
-  max-width: 85vw;
+  width: 340px;
+  max-width: 90vw;
   background-color: var(--color-surface);
   border-right: 2px solid var(--color-border);
   z-index: 1000;
@@ -92,7 +92,7 @@
 }
 
 .sectionTitle {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--color-text);
   margin: 0 0 1rem 0;
@@ -169,6 +169,73 @@
 .actionButton:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+}
+
+/* Toggle Switches */
+.toggleList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle:hover {
+  border-color: var(--color-primary);
+}
+
+.toggleLabel {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.toggleInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleSwitch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background-color: var(--color-border);
+  border-radius: 12px;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.toggleSwitch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-surface);
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.toggleInput:checked + .toggleSwitch {
+  background-color: var(--color-primary);
+}
+
+.toggleInput:checked + .toggleSwitch::after {
+  transform: translateX(20px);
 }
 
 /* Theme Grid */
@@ -286,13 +353,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.comingSoon {
-  color: var(--color-text-dim);
-  font-size: 0.875rem;
-  font-style: italic;
-  margin: 0;
-}
-
 /* Scrollbar styling */
 .content::-webkit-scrollbar {
   width: 8px;
@@ -314,7 +374,7 @@
 /* Mobile adjustments */
 @media (max-width: 400px) {
   .panel {
-    width: 280px;
+    width: 300px;
   }
 
   .header {
@@ -331,5 +391,9 @@
 
   .themeGrid {
     grid-template-columns: 1fr;
+  }
+
+  .toggleLabel {
+    font-size: 0.8rem;
   }
 }

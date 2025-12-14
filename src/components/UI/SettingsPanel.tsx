@@ -11,6 +11,8 @@ interface SettingsPanelProps {
 const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   const theme = useStore((state) => state.settings.theme);
   const setTheme = useStore((state) => state.setTheme);
+  const gameplay = useStore((state) => state.settings.gameplay);
+  const setGameplaySetting = useStore((state) => state.setGameplaySetting);
   const difficulty = useStore((state) => state.game.difficulty);
   const startNewGame = useStore((state) => state.startNewGame);
   const mistakes = useStore((state) => state.game.mistakes);
@@ -21,6 +23,15 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   const canUndo = useStore((state) => state.canUndo());
   const canRedo = useStore((state) => state.canRedo());
   const useHint = useStore((state) => state.useHint);
+
+  // Safe access to gameplay settings with defaults
+  const autoCheckMistakes = gameplay?.autoCheckMistakes ?? true;
+  const highlightConflicts = gameplay?.highlightConflicts ?? true;
+  const highlightRowColumn = gameplay?.highlightRowColumn ?? true;
+  const highlightBox = gameplay?.highlightBox ?? true;
+  const highlightIdentical = gameplay?.highlightIdentical ?? true;
+  const showTimer = gameplay?.showTimer ?? true;
+  const showMistakes = gameplay?.showMistakes ?? true;
 
   const themes: { name: ThemeName; label: string }[] = [
     { name: 'clean', label: 'Clean' },
@@ -118,6 +129,89 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
             </div>
           </section>
 
+          {/* Gameplay Options */}
+          <section className={styles.section}>
+            <h3 className={styles.sectionTitle}>Gameplay Options</h3>
+            <div className={styles.toggleList}>
+              <label className={styles.toggle}>
+                <span className={styles.toggleLabel}>Auto-check mistakes</span>
+                <input
+                  type="checkbox"
+                  checked={autoCheckMistakes}
+                  onChange={(e) => setGameplaySetting('autoCheckMistakes', e.target.checked)}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleSwitch}></span>
+              </label>
+
+              <label className={styles.toggle}>
+                <span className={styles.toggleLabel}>Highlight conflicts</span>
+                <input
+                  type="checkbox"
+                  checked={highlightConflicts}
+                  onChange={(e) => setGameplaySetting('highlightConflicts', e.target.checked)}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleSwitch}></span>
+              </label>
+
+              <label className={styles.toggle}>
+                <span className={styles.toggleLabel}>Highlight row & column</span>
+                <input
+                  type="checkbox"
+                  checked={highlightRowColumn}
+                  onChange={(e) => setGameplaySetting('highlightRowColumn', e.target.checked)}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleSwitch}></span>
+              </label>
+
+              <label className={styles.toggle}>
+                <span className={styles.toggleLabel}>Highlight box</span>
+                <input
+                  type="checkbox"
+                  checked={highlightBox}
+                  onChange={(e) => setGameplaySetting('highlightBox', e.target.checked)}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleSwitch}></span>
+              </label>
+
+              <label className={styles.toggle}>
+                <span className={styles.toggleLabel}>Highlight identical numbers</span>
+                <input
+                  type="checkbox"
+                  checked={highlightIdentical}
+                  onChange={(e) => setGameplaySetting('highlightIdentical', e.target.checked)}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleSwitch}></span>
+              </label>
+
+              <label className={styles.toggle}>
+                <span className={styles.toggleLabel}>Show timer</span>
+                <input
+                  type="checkbox"
+                  checked={showTimer}
+                  onChange={(e) => setGameplaySetting('showTimer', e.target.checked)}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleSwitch}></span>
+              </label>
+
+              <label className={styles.toggle}>
+                <span className={styles.toggleLabel}>Show mistakes counter</span>
+                <input
+                  type="checkbox"
+                  checked={showMistakes}
+                  onChange={(e) => setGameplaySetting('showMistakes', e.target.checked)}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleSwitch}></span>
+              </label>
+            </div>
+          </section>
+
           {/* Theme Selection */}
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>Theme</h3>
@@ -174,12 +268,6 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
                 </div>
               </div>
             </div>
-          </section>
-
-          {/* Gameplay Settings - Placeholder for future */}
-          <section className={styles.section}>
-            <h3 className={styles.sectionTitle}>Gameplay Options</h3>
-            <p className={styles.comingSoon}>Coming soon: Auto-check, Highlight options, and more!</p>
           </section>
         </div>
       </div>

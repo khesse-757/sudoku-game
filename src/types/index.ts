@@ -9,6 +9,16 @@ export interface Cell {
   notes: number[]; // Pencil marks
 }
 
+export interface GameplaySettings {
+  autoCheckMistakes: boolean;
+  highlightConflicts: boolean;
+  highlightRowColumn: boolean;
+  highlightBox: boolean;
+  highlightIdentical: boolean;
+  showTimer: boolean;
+  showMistakes: boolean;
+}
+
 export interface GameState {
   puzzle: number[][];
   solution: number[][];
@@ -25,6 +35,7 @@ export interface GameState {
 export interface SettingsState {
   theme: ThemeName;
   font: FontFamily;
+  gameplay: GameplaySettings;
   animations: {
     cellHighlight: boolean;
     numberPlacement: boolean;
@@ -36,7 +47,6 @@ export interface SettingsState {
     musicEnabled: boolean;
     musicVolume: number;
   };
-  mistakeHighlight: boolean;
 }
 
 export interface Statistics {

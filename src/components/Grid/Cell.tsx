@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { useStore } from '../../store';
 import styles from './Cell.module.css';
 
@@ -13,70 +12,124 @@ interface CellProps {
 }
 
 const Cell = ({ value, notes, isGiven, isSelected, row, col, onClick }: CellProps) => {
-  const animationsEnabled = useStore((state) => state.settings.animations.cellHighlight);
-  const mistakeHighlight = useStore((state) => state.settings.mistakeHighlight);
-  const solution = useStore((state) => state.game.solution);
   const selectedCell = useStore((state) => state.game.selectedCell);
   const userGrid = useStore((state) => state.game.userGrid);
+  const solution = useStore((state) => state.game.solution);
+  const gameplay = useStore((state) => state.settings.gameplay);
 
-  // Check if this cell has a mistake
-  const isMistake = !isGiven && value !== 0 && value !== solution[row][col];
+  // Safe access to gameplay settings with defaults
+  const highlightRowColumn = gameplay?.highlightRowColumn ?? true;
+  const highlightBox = gameplay?.highlightBox ?? true;
+  const highlightIdentical = gameplay?.highlightIdentical ?? true;
+  const autoCheckMistakes = gameplay?.autoCheckMistakes ?? true;
+  const highlightConflicts = gameplay?.highlightConflicts ?? true;
 
-  // Check if this cell should be highlighted
-  const isHighlighted = selectedCell && !isSelected && (() => {
+  // Determine if this cell should be highlighted
+  let isHighlighted = false;
+  
+  if (selectedCell && !isSelected) {
     const [selRow, selCol] = selectedCell;
     
-    // Same row or column
-    if (row === selRow || col === selCol) return true;
+    // Highlight row and column
+    if (highlightRowColumn && (row === selRow || col === selCol)) {
+      isHighlighted = true;
+    }
     
-    // Same 3x3 box
-    const boxRow = Math.floor(row / 3);
-    const boxCol = Math.floor(col / 3);
-    const selBoxRow = Math.floor(selRow / 3);
-    const selBoxCol = Math.floor(selCol / 3);
-    if (boxRow === selBoxRow && boxCol === selBoxCol) return true;
+    // Highlight same 3x3 box
+    if (highlightBox) {
+      const boxRow = Math.floor(row / 3);
+      const boxCol = Math.floor(col / 3);
+      const selBoxRow = Math.floor(selRow / 3);
+      const selBoxCol = Math.floor(selCol / 3);
+      
+      if (boxRow === selBoxRow && boxCol === selBoxCol) {
+        isHighlighted = true;
+      }
+    }
     
-    // Same number (if both cells have values)
-    const selectedValue = userGrid[selRow][selCol].value;
-    if (value !== 0 && selectedValue !== 0 && value === selectedValue) return true;
-    
-    return false;
-  })();
+    // Highlight identical numbers
+    if (highlightIdentical && value !== 0) {
+      const selectedValue = userGrid[selRow][selCol].value;
+      if (selectedValue !== 0 && value === selectedValue) {
+        isHighlighted = true;
+      }
+    }
+  }
 
-  const cellClasses = [
+  // Check if this is a mistake (wrong number)
+  const isMistake = autoCheckMistakes && 
+    value !== 0 && 
+    !isGiven && 
+    value !== solution[row][col];
+
+  // Check for conflicts
+  const hasConflict = highlightConflicts && 
+    value !== 0 && 
+    !isGiven && 
+    checkForConflict(row, col, value, userGrid);
+
+  // Determine if this cell has thick borders (3x3 grid lines)
+  const hasRightBorder = col === 2 || col === 5;
+  const hasBottomBorder = row === 2 || row === 5;
+
+  const classNames = [
     styles.cell,
-    isGiven ? styles.given : '',
-    isSelected ? styles.selected : '',
-    isHighlighted ? styles.highlighted : '',
-    isMistake && mistakeHighlight ? styles.mistake : '',
-    col % 3 === 2 && col !== 8 ? styles.rightBorder : '',
-    row % 3 === 2 && row !== 8 ? styles.bottomBorder : '',
+    isSelected && styles.selected,
+    isHighlighted && styles.highlighted,
+    isGiven && styles.given,
+    (isMistake || hasConflict) && styles.mistake,
+    hasRightBorder && styles.rightBorder,
+    hasBottomBorder && styles.bottomBorder,
   ].filter(Boolean).join(' ');
 
   return (
-    <motion.div
-      className={cellClasses}
-      onClick={onClick}
-      whileHover={animationsEnabled ? { scale: 1.05 } : undefined}
-      whileTap={animationsEnabled ? { scale: 0.95 } : undefined}
-      transition={{ duration: 0.1 }}
-    >
+    <div className={classNames} onClick={onClick}>
       {value !== 0 ? (
         <span className={styles.value}>{value}</span>
       ) : notes.length > 0 ? (
         <div className={styles.notes}>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
             <span
-              key={num}
-              className={notes.includes(num) ? styles.noteActive : styles.noteInactive}
+              key={n}
+              className={notes.includes(n) ? styles.noteActive : styles.noteInactive}
             >
-              {notes.includes(num) ? num : ''}
+              {notes.includes(n) ? n : ''}
             </span>
           ))}
         </div>
       ) : null}
-    </motion.div>
+    </div>
   );
 };
+
+// Helper function to check for conflicts in row, column, or box
+function checkForConflict(row: number, col: number, value: number, grid: { value: number }[][]): boolean {
+  // Check row
+  for (let c = 0; c < 9; c++) {
+    if (c !== col && grid[row][c].value === value) {
+      return true;
+    }
+  }
+
+  // Check column
+  for (let r = 0; r < 9; r++) {
+    if (r !== row && grid[r][col].value === value) {
+      return true;
+    }
+  }
+
+  // Check 3x3 box
+  const boxRow = Math.floor(row / 3) * 3;
+  const boxCol = Math.floor(col / 3) * 3;
+  for (let r = boxRow; r < boxRow + 3; r++) {
+    for (let c = boxCol; c < boxCol + 3; c++) {
+      if ((r !== row || c !== col) && grid[r][c].value === value) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
 
 export default Cell;
