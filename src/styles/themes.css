@@ -1,0 +1,26 @@
+/* Theme-specific overrides will be applied via CSS variables in global.css */
+/* This file is for any theme-specific custom styles that can't be done via variables */
+
+.theme-green {
+  /* Green phosphor theme is the default */
+}
+
+.theme-amber {
+  /* Amber theme styles */
+}
+
+.theme-paper {
+  /* Paper theme - inverted, no glow effects */
+}
+
+.theme-paper .terminal-glow {
+  text-shadow: none;
+}
+
+.theme-paper .scanline::before {
+  display: none;
+}
+
+.theme-monochrome {
+  /* Pure black and white */
+}
