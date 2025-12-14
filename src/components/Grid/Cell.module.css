@@ -5,6 +5,7 @@
   justify-content: center;
   font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: 500;
+  color: var(--color-text-dim);
   cursor: pointer;
   transition: all 0.15s ease;
   position: relative;
@@ -33,15 +34,29 @@
   border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
 
+/* Given numbers - the original puzzle numbers */
 .cell.given {
   color: var(--color-text);
-  font-weight: 700;
-  text-shadow: 0 0 8px currentColor;
+  font-weight: 800;
+  background-color: color-mix(in srgb, var(--color-border) 30%, var(--color-surface));
 }
 
 .cell.given.selected {
   color: var(--color-background);
-  text-shadow: none;
+  background-color: var(--color-primary);
+}
+
+.cell.given.highlighted {
+  background-color: color-mix(in srgb, var(--color-primary) 25%, color-mix(in srgb, var(--color-border) 30%, var(--color-surface)));
+}
+
+/* User-entered numbers - lighter weight, different color */
+.cell:not(.given) .value {
+  color: var(--color-primary);
+}
+
+.cell.selected:not(.given) .value {
+  color: var(--color-background);
 }
 
 .cell.rightBorder {
@@ -53,7 +68,6 @@
 }
 
 .value {
-  color: inherit;
   line-height: 1;
 }
 
@@ -90,13 +104,11 @@
   opacity: 0;
 }
 
-/* Better contrast for notes in selected cells */
 .cell.selected .noteActive {
   color: var(--color-background);
   opacity: 1;
 }
 
-/* Better contrast for notes in highlighted cells */
 .cell.highlighted .noteActive {
   color: var(--color-text);
   opacity: 1;
@@ -125,6 +137,7 @@
   }
 }
 
+/* Mistake styling */
 .cell.mistake {
   color: var(--color-error);
   background-color: color-mix(in srgb, var(--color-error) 15%, var(--color-surface));

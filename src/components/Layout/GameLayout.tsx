@@ -5,6 +5,7 @@ import { useKeyboard } from '../../hooks/useKeyboard';
 import NumberPad from '../Controls/NumberPad';
 import VictoryModal from '../UI/VictoryModal';
 import SettingsButton from '../UI/SettingsButton';
+import SettingsPanel from '../UI/SettingsPanel';
 import Grid from '../Grid/Grid';
 import { Play, Pause } from 'lucide-react';
 import styles from './GameLayout.module.css';
@@ -20,6 +21,7 @@ const GameLayout = () => {
   const pauseGame = useStore((state) => state.pauseGame);
   const resumeGame = useStore((state) => state.resumeGame);
   const [isPencilMode, setIsPencilMode] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Timer tick
   useEffect(() => {
@@ -80,9 +82,10 @@ const GameLayout = () => {
   return (
     <div className={styles.layout}>
       <VictoryModal />
+      <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       
       <header className={styles.header}>
-        <SettingsButton />
+        <SettingsButton onClick={() => setIsSettingsOpen(true)} />
         <h1 className={styles.title}>SUDOKU.TERMINAL</h1>
         <div className={styles.spacer}></div>
       </header>

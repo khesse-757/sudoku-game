@@ -1,0 +1,335 @@
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 85vw;
+  background-color: var(--color-surface);
+  border-right: 2px solid var(--color-border);
+  z-index: 1000;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel.open {
+  transform: translateX(0);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 2px solid var(--color-border);
+  background-color: var(--color-background);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background-color: transparent;
+  color: var(--color-text);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 4px;
+}
+
+.closeButton:hover {
+  background-color: var(--color-background);
+  color: var(--color-primary);
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* New Game Buttons */
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.difficultyButton {
+  padding: 0.75rem 1rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 4px;
+}
+
+.difficultyButton:hover {
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+.difficultyButton.active {
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+/* Action Buttons */
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 4px;
+}
+
+.actionButton:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+.actionButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Theme Grid */
+.themeGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.themeButton {
+  padding: 0.75rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border: 2px solid var(--color-border);
+  font-family: var(--font-family);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 4px;
+}
+
+.themeButton:hover {
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+.themeButton.active {
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+/* Statistics */
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.statCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.statIcon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.statContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.statLabel {
+  font-size: 0.7rem;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.statValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.bestTimes {
+  padding: 1rem;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+
+.bestTimesTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-dim);
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bestTimesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.bestTime {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.bestTime span:first-child {
+  color: var(--color-text-dim);
+}
+
+.bestTime span:last-child {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.comingSoon {
+  color: var(--color-text-dim);
+  font-size: 0.875rem;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Scrollbar styling */
+.content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.content::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.content::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+/* Mobile adjustments */
+@media (max-width: 400px) {
+  .panel {
+    width: 280px;
+  }
+
+  .header {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .themeGrid {
+    grid-template-columns: 1fr;
+  }
+}

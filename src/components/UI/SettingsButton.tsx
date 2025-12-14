@@ -1,16 +1,15 @@
 import { Menu } from 'lucide-react';
 import styles from './SettingsButton.module.css';
 
-const SettingsButton = () => {
-  const handleClick = () => {
-    // TODO: Open settings panel (Phase 2)
-    console.log('Settings clicked - will implement in Phase 2');
-  };
+interface SettingsButtonProps {
+  onClick: () => void;
+}
 
+const SettingsButton = ({ onClick }: SettingsButtonProps) => {
   return (
     <button 
       className={styles.settingsButton}
-      onClick={handleClick}
+      onClick={onClick}
       aria-label="Settings"
     >
       <Menu size={24} />

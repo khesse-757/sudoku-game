@@ -4,6 +4,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
 .grid {
@@ -13,71 +14,10 @@
   background-color: var(--color-border);
   border: 3px solid var(--color-border);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  aspect-ratio: 1;
-  position: relative;
 }
 
-/* Mobile Portrait */
-@media (max-width: 767px) and (orientation: portrait) {
+@media (max-width: 767px) {
   .grid {
-    width: min(100%, calc(100vw - 3rem));
-    height: min(100%, calc(100vw - 3rem));
-    max-width: min(500px, calc(100vh - 350px));
-    max-height: min(500px, calc(100vh - 350px));
     border-width: 2px;
-  }
-}
-
-/* Mobile Landscape */
-@media (max-width: 767px) and (orientation: landscape) {
-  .grid {
-    width: min(calc(100vh - 200px), calc(100vw - 50vw));
-    height: min(calc(100vh - 200px), calc(100vw - 50vw));
-    max-width: 500px;
-    max-height: 500px;
-    border-width: 2px;
-  }
-}
-
-/* Desktop - Fill available space in left panel */
-@media (min-width: 768px) {
-  .grid {
-    /* Take up as much space as possible while maintaining aspect ratio */
-    width: min(calc(100vh - 150px), calc(100vw - 550px), 700px);
-    height: min(calc(100vh - 150px), calc(100vw - 550px), 700px);
-  }
-}
-
-/* Large Desktop */
-@media (min-width: 1200px) {
-  .grid {
-    width: min(calc(100vh - 150px), calc(100vw - 600px), 750px);
-    height: min(calc(100vh - 150px), calc(100vw - 600px), 750px);
-  }
-}
-
-/* Extra Large Desktop */
-@media (min-width: 1440px) {
-  .grid {
-    width: min(calc(100vh - 150px), calc(100vw - 650px), 800px);
-    height: min(calc(100vh - 150px), calc(100vw - 650px), 800px);
-  }
-}
-
-/* Very small mobile */
-@media (max-width: 360px) {
-  .grid {
-    width: calc(100vw - 2rem);
-    height: calc(100vw - 2rem);
-    max-width: min(350px, calc(100vh - 300px));
-    max-height: min(350px, calc(100vh - 300px));
-  }
-}
-
-/* Short screens */
-@media (max-height: 600px) and (max-width: 767px) {
-  .grid {
-    width: min(calc(100vh - 200px), 400px);
-    height: min(calc(100vh - 200px), 400px);
   }
 }
