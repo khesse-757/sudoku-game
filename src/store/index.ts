@@ -644,6 +644,7 @@ export const useStore = create<Store>()(
             selectedCell: null,
             isComplete: false,
             mistakes: 0,
+            timer: 0,
           },
           history: [cloneGrid(userGrid)],
           historyIndex: 0,
