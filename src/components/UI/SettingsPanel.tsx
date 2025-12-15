@@ -1,4 +1,5 @@
-import { X, RotateCcw, Lightbulb, CheckCircle, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { X, RotateCcw, Lightbulb, CheckCircle, AlertCircle, Eye, EyeOff, RefreshCw, Check, Trash2 } from 'lucide-react';
 import { useStore } from '../../store';
 import type { ThemeName, Difficulty } from '../../types';
 import styles from './SettingsPanel.module.css';
@@ -23,6 +24,15 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   const canUndo = useStore((state) => state.canUndo());
   const canRedo = useStore((state) => state.canRedo());
   const useHint = useStore((state) => state.useHint);
+  const checkCell = useStore((state) => state.checkCell);
+  const checkPuzzle = useStore((state) => state.checkPuzzle);
+  const revealCell = useStore((state) => state.revealCell);
+  const revealPuzzle = useStore((state) => state.revealPuzzle);
+  const resetPuzzle = useStore((state) => state.resetPuzzle);
+  const resetStats = useStore((state) => state.resetStats);
+  const selectedCell = useStore((state) => state.game.selectedCell);
+
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   // Safe access to gameplay settings with defaults
   const autoCheckMistakes = gameplay?.autoCheckMistakes ?? true;
@@ -32,19 +42,89 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
   const highlightIdentical = gameplay?.highlightIdentical ?? true;
   const showTimer = gameplay?.showTimer ?? true;
   const showMistakes = gameplay?.showMistakes ?? true;
+  const autoNotes = gameplay?.autoNotes ?? false;
 
   const themes: { name: ThemeName; label: string }[] = [
+    { name: 'light', label: 'Light' },
+    { name: 'dark', label: 'Dark' },
     { name: 'clean', label: 'Clean' },
-    { name: 'green', label: 'Green Terminal' },
-    { name: 'amber', label: 'Amber Terminal' },
     { name: 'paper', label: 'Paper' },
+    { name: 'green', label: 'Terminal Green' },
+    { name: 'amber', label: 'Terminal Amber' },
+    { name: 'ocean', label: 'Ocean' },
     { name: 'monochrome', label: 'Monochrome' },
   ];
+
+  const showFeedback = (message: string) => {
+    setFeedback(message);
+    setTimeout(() => setFeedback(null), 2500);
+  };
 
   const handleNewGame = (diff: Difficulty) => {
     if (confirm(`Start a new ${diff} game? Current progress will be lost.`)) {
       startNewGame(diff);
       onClose();
+    }
+  };
+
+  const handleCheckCell = () => {
+    if (!selectedCell) {
+      showFeedback('Select a cell first');
+      return;
+    }
+    const result = checkCell();
+    if (!result.checked) {
+      showFeedback('Cell is empty');
+    } else if (result.correct) {
+      showFeedback('✓ Correct!');
+    } else {
+      showFeedback('✗ Incorrect');
+    }
+  };
+
+  const handleCheckPuzzle = () => {
+    const result = checkPuzzle();
+    if (result.total === 0) {
+      showFeedback('No cells to check');
+    } else if (result.incorrect === 0) {
+      showFeedback(`✓ All ${result.correct} entries correct!`);
+    } else {
+      showFeedback(`${result.correct} correct, ${result.incorrect} incorrect`);
+    }
+  };
+
+  const handleRevealCell = () => {
+    if (!selectedCell) {
+      showFeedback('Select a cell first');
+      return;
+    }
+    const revealed = revealCell();
+    if (revealed) {
+      showFeedback('Cell revealed');
+    } else {
+      showFeedback('Cell already correct');
+    }
+  };
+
+  const handleRevealPuzzle = () => {
+    if (confirm('Reveal the entire solution? This will end the game.')) {
+      revealPuzzle();
+      showFeedback('Puzzle revealed');
+      onClose();
+    }
+  };
+
+  const handleResetPuzzle = () => {
+    if (confirm('Reset the puzzle? All your progress will be cleared.')) {
+      resetPuzzle();
+      showFeedback('Puzzle reset');
+    }
+  };
+
+  const handleResetStats = () => {
+    if (confirm('Reset all statistics? This cannot be undone.')) {
+      resetStats();
+      showFeedback('Statistics reset');
     }
   };
 
@@ -65,11 +145,18 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
       {/* Panel */}
       <div className={`${styles.panel} ${isOpen ? styles.open : ''}`}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Settings</h2>
+          <h2 className={styles.title}>Menu</h2>
           <button onClick={onClose} className={styles.closeButton} aria-label="Close">
             <X size={24} />
           </button>
         </div>
+
+        {/* Feedback Toast */}
+        {feedback && (
+          <div className={styles.feedback}>
+            {feedback}
+          </div>
+        )}
 
         <div className={styles.content}>
           {/* New Game Section */}
@@ -100,14 +187,14 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
           {/* Game Actions */}
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>Game Actions</h3>
-            <div className={styles.actionButtons}>
+            <div className={styles.actionGrid}>
               <button 
                 onClick={undo}
                 disabled={!canUndo}
                 className={styles.actionButton}
               >
                 <RotateCcw size={18} />
-                Undo
+                <span>Undo</span>
               </button>
               <button 
                 onClick={redo}
@@ -115,7 +202,7 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
                 className={styles.actionButton}
               >
                 <RotateCcw size={18} style={{ transform: 'scaleX(-1)' }} />
-                Redo
+                <span>Redo</span>
               </button>
               <button 
                 onClick={useHint}
@@ -124,7 +211,49 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
                 title={difficulty === 'hard' ? 'No hints in Hard mode' : `${hintsRemaining} hints remaining`}
               >
                 <Lightbulb size={18} />
-                Hint ({difficulty === 'hard' ? 0 : hintsRemaining})
+                <span>Hint ({difficulty === 'hard' ? 0 : hintsRemaining})</span>
+              </button>
+              <button 
+                onClick={handleResetPuzzle}
+                className={styles.actionButton}
+              >
+                <RefreshCw size={18} />
+                <span>Reset</span>
+              </button>
+            </div>
+          </section>
+
+          {/* Check & Reveal */}
+          <section className={styles.section}>
+            <h3 className={styles.sectionTitle}>Check & Reveal</h3>
+            <div className={styles.actionGrid}>
+              <button 
+                onClick={handleCheckCell}
+                className={styles.actionButton}
+              >
+                <Check size={18} />
+                <span>Check Cell</span>
+              </button>
+              <button 
+                onClick={handleCheckPuzzle}
+                className={styles.actionButton}
+              >
+                <CheckCircle size={18} />
+                <span>Check All</span>
+              </button>
+              <button 
+                onClick={handleRevealCell}
+                className={styles.actionButton}
+              >
+                <Eye size={18} />
+                <span>Reveal Cell</span>
+              </button>
+              <button 
+                onClick={handleRevealPuzzle}
+                className={`${styles.actionButton} ${styles.dangerButton}`}
+              >
+                <EyeOff size={18} />
+                <span>Reveal All</span>
               </button>
             </div>
           </section>
@@ -133,6 +262,17 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>Gameplay Options</h3>
             <div className={styles.toggleList}>
+              <label className={styles.toggle}>
+                <span className={styles.toggleLabel}>Auto notes</span>
+                <input
+                  type="checkbox"
+                  checked={autoNotes}
+                  onChange={(e) => setGameplaySetting('autoNotes', e.target.checked)}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleSwitch}></span>
+              </label>
+
               <label className={styles.toggle}>
                 <span className={styles.toggleLabel}>Auto-check mistakes</span>
                 <input
@@ -268,6 +408,13 @@ const SettingsPanel = ({ isOpen, onClose }: SettingsPanelProps) => {
                 </div>
               </div>
             </div>
+            <button 
+              onClick={handleResetStats}
+              className={`${styles.resetStatsButton}`}
+            >
+              <Trash2 size={16} />
+              <span>Reset Statistics</span>
+            </button>
           </section>
         </div>
       </div>

@@ -11,12 +11,17 @@ interface PuzzleResult {
  * Generate a new Sudoku puzzle with the given difficulty
  */
 export const generatePuzzle = (difficulty: Difficulty): PuzzleResult => {
-  // Generate a complete solved board
-  const solvedString = sudoku.makepuzzle();
-  const solutionString = sudoku.solvepuzzle(solvedString);
+  // Generate a puzzle with the sudoku library
+  const puzzleArray = sudoku.makepuzzle();
+  const solutionArray = sudoku.solvepuzzle(puzzleArray);
 
-  // Convert to 2D arrays (sudoku library uses 1D arrays with null for empty)
-  const solution = stringToGrid(solutionString);
+  if (!solutionArray) {
+    // Fallback: try again if solve fails
+    return generatePuzzle(difficulty);
+  }
+
+  // Convert to 2D arrays (sudoku library uses 1D arrays with null for empty, 0-8 for values)
+  const solution = arrayToGrid(solutionArray);
   
   // Create puzzle by removing cells based on difficulty
   const puzzle = createPuzzleFromSolution(solution, difficulty);
@@ -27,13 +32,14 @@ export const generatePuzzle = (difficulty: Difficulty): PuzzleResult => {
 /**
  * Convert sudoku library format (1D array, 0-8) to our format (2D array, 1-9)
  */
-const stringToGrid = (puzzleArray: number[]): number[][] => {
+const arrayToGrid = (puzzleArray: (number | null)[]): number[][] => {
   const grid: number[][] = [];
   for (let i = 0; i < 9; i++) {
     const row: number[] = [];
     for (let j = 0; j < 9; j++) {
       const value = puzzleArray[i * 9 + j];
-      row.push(value + 1); // Convert from 0-8 to 1-9
+      // Convert from 0-8 to 1-9, null becomes 0
+      row.push(value !== null ? value + 1 : 0);
     }
     grid.push(row);
   }
@@ -46,7 +52,7 @@ const stringToGrid = (puzzleArray: number[]): number[][] => {
 const createPuzzleFromSolution = (solution: number[][], difficulty: Difficulty): number[][] => {
   const puzzle = solution.map(row => [...row]);
   const config = DIFFICULTY_CONFIG[difficulty];
-  const cellsToRemove = 81 - config.givens;
+  const cellsToRemove = 81 - config.clues; // Use 'clues' not 'givens'
 
   // Get all cell positions
   const positions: [number, number][] = [];
@@ -56,14 +62,14 @@ const createPuzzleFromSolution = (solution: number[][], difficulty: Difficulty):
     }
   }
 
-  // Shuffle positions
+  // Shuffle positions using Fisher-Yates
   for (let i = positions.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [positions[i], positions[j]] = [positions[j], positions[i]];
   }
 
   // Remove cells
-  for (let i = 0; i < cellsToRemove; i++) {
+  for (let i = 0; i < cellsToRemove && i < positions.length; i++) {
     const [r, c] = positions[i];
     puzzle[r][c] = 0;
   }

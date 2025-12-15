@@ -4,11 +4,23 @@ import { THEMES, FONTS } from '../../utils/constants';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import NumberPad from '../Controls/NumberPad';
 import VictoryModal from '../UI/VictoryModal';
+import PauseOverlay from '../UI/PauseOverlay';
 import SettingsButton from '../UI/SettingsButton';
 import SettingsPanel from '../UI/SettingsPanel';
 import Grid from '../Grid/Grid';
 import { Play, Pause, AlertCircle } from 'lucide-react';
 import styles from './GameLayout.module.css';
+
+const defaultGameplay = {
+  autoCheckMistakes: true,
+  highlightConflicts: true,
+  highlightRowColumn: true,
+  highlightBox: true,
+  highlightIdentical: true,
+  showTimer: true,
+  showMistakes: true,
+  autoNotes: false,
+};
 
 const GameLayout = () => {
   const theme = useStore((state) => state.settings.theme);
@@ -17,7 +29,7 @@ const GameLayout = () => {
   const timer = useStore((state) => state.game.timer);
   const isPaused = useStore((state) => state.game.isPaused);
   const mistakes = useStore((state) => state.game.mistakes);
-  const gameplay = useStore((state) => state.settings.gameplay);
+  const rawGameplay = useStore((state) => state.settings.gameplay);
   const startNewGame = useStore((state) => state.startNewGame);
   const incrementTimer = useStore((state) => state.incrementTimer);
   const pauseGame = useStore((state) => state.pauseGame);
@@ -25,9 +37,8 @@ const GameLayout = () => {
   const [isPencilMode, setIsPencilMode] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // Safe access to gameplay settings with defaults
-  const showTimer = gameplay?.showTimer ?? true;
-  const showMistakes = gameplay?.showMistakes ?? true;
+  // Merge with defaults to ensure all properties exist
+  const gameplay = { ...defaultGameplay, ...rawGameplay };
 
   // Timer tick
   useEffect(() => {
@@ -43,7 +54,7 @@ const GameLayout = () => {
     const themeConfig = THEMES[theme];
     const root = document.documentElement;
 
-    // Set CSS variables
+    // Core colors
     root.style.setProperty('--color-primary', themeConfig.primary);
     root.style.setProperty('--color-secondary', themeConfig.secondary);
     root.style.setProperty('--color-background', themeConfig.background);
@@ -53,6 +64,19 @@ const GameLayout = () => {
     root.style.setProperty('--color-error', themeConfig.error);
     root.style.setProperty('--color-success', themeConfig.success);
     root.style.setProperty('--color-border', themeConfig.border);
+    
+    // Border for 3x3 boxes
+    root.style.setProperty('--color-border-thick', themeConfig.borderThick || themeConfig.text);
+
+    // Cell highlighting colors
+    root.style.setProperty('--color-given', themeConfig.given || themeConfig.surface);
+    root.style.setProperty('--color-highlight', themeConfig.highlight || themeConfig.surface);
+    root.style.setProperty('--color-given-highlighted', themeConfig.givenHighlighted || themeConfig.given || themeConfig.surface);
+    root.style.setProperty('--color-identical', themeConfig.identical || themeConfig.highlight || themeConfig.surface);
+    root.style.setProperty('--color-given-identical', themeConfig.givenIdentical || themeConfig.identical || themeConfig.surface);
+    root.style.setProperty('--color-selected', themeConfig.selected || themeConfig.primary);
+    root.style.setProperty('--color-selected-text', themeConfig.selectedText || themeConfig.background);
+    root.style.setProperty('--color-conflict', themeConfig.conflict || '#ffcccc');
 
     // Set font
     root.style.setProperty('--font-family', FONTS[font]);
@@ -89,14 +113,14 @@ const GameLayout = () => {
     <div className={styles.gameInfoBar}>
       <span className={styles.difficulty}>{difficulty.toUpperCase()}</span>
       
-      {showMistakes && mistakes > 0 && (
+      {gameplay.showMistakes && (
         <div className={styles.mistakesCounter}>
           <AlertCircle size={iconSize} />
           <span>{mistakes}</span>
         </div>
       )}
       
-      {showTimer && (
+      {gameplay.showTimer && (
         <div className={styles.timerSection}>
           <button 
             onClick={togglePause}
@@ -114,6 +138,7 @@ const GameLayout = () => {
   return (
     <div className={styles.layout}>
       <VictoryModal />
+      <PauseOverlay />
       <SettingsPanel isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       
       <header className={styles.header}>

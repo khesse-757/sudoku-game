@@ -1,6 +1,6 @@
 // Core game types
 export type Difficulty = 'easy' | 'medium' | 'hard';
-export type ThemeName = 'green' | 'amber' | 'paper' | 'monochrome' | 'clean';
+export type ThemeName = 'light' | 'dark' | 'green' | 'amber' | 'paper' | 'monochrome' | 'ocean' | 'clean';
 export type FontFamily = 'jetbrains' | 'fira' | 'ibm' | 'courier';
 
 export interface Cell {
@@ -17,6 +17,7 @@ export interface GameplaySettings {
   highlightIdentical: boolean;
   showTimer: boolean;
   showMistakes: boolean;
+  autoNotes: boolean;
 }
 
 export interface GameState {

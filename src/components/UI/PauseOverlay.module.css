@@ -1,0 +1,164 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-background);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 3rem;
+  text-align: center;
+  background-color: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+}
+
+.pauseIcon {
+  width: 80px;
+  height: 80px;
+  border: 3px solid var(--color-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pauseBars {
+  display: flex;
+  gap: 8px;
+}
+
+.pauseBars span {
+  width: 8px;
+  height: 32px;
+  background-color: var(--color-primary);
+  border-radius: 2px;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.info {
+  display: flex;
+  gap: 3rem;
+  padding: 1.5rem;
+  background-color: var(--color-background);
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.infoLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.infoValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.resumeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2.5rem;
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  border: none;
+  font-family: var(--font-family);
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 4px;
+}
+
+.resumeButton:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.resumeButton:active {
+  transform: scale(0.98);
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .content {
+    padding: 2rem;
+    gap: 1.5rem;
+  }
+
+  .pauseIcon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .pauseBars span {
+    width: 6px;
+    height: 24px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .info {
+    gap: 2rem;
+    padding: 1rem;
+  }
+
+  .infoLabel {
+    font-size: 0.7rem;
+  }
+
+  .infoValue {
+    font-size: 1.25rem;
+  }
+
+  .resumeButton {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+  }
+}
