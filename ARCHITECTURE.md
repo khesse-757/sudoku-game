@@ -1,7 +1,6 @@
 # Sudoku Terminal — Architecture Documentation
-
-> **Last Updated**: December 2025  
-> **Status**: Living document
+ 
+> **Last Updated**: December 2025 
 
 ## Table of Contents
 
@@ -168,8 +167,8 @@ graph TB
             puzzle[puzzle: number 9×9]
             solution[solution: number 9×9]
             userGrid[userGrid: Cell 9×9]
-            selectedCell[selectedCell: tuple | null]
-            difficulty[difficulty: easy|medium|hard]
+            selectedCell[selectedCell: tuple or null]
+            difficulty[difficulty: easy/medium/hard]
             timer[timer: number]
             isPaused[isPaused: boolean]
             isComplete[isComplete: boolean]
@@ -467,7 +466,7 @@ flowchart TD
     GameLayout -->|useEffect| useEffect
     useEffect -->|setProperty| root
     useEffect -->|className| body
-    root -->|var()| cells
+    root -->|CSS vars| cells
 ```
 
 ### CSS Variable Flow

@@ -4,6 +4,8 @@ A terminal-themed Sudoku game built with React, TypeScript, and Vite.
 
 **[Play Live](https://sudoku.kahdev.me/)**
 
+![Sudoku Terminal - Terminal-themed Sudoku game](sudoku-terminal.png)
+
 ## Features
 
 - **Three difficulty levels** with unique, solvable puzzles
@@ -13,7 +15,7 @@ A terminal-themed Sudoku game built with React, TypeScript, and Vite.
 - **Undo/Redo**: Full move history with keyboard shortcuts
 - **Timer** with pause/resume
 - **Mistake tracking** with optional auto-check highlighting
-- **Hint, Check and Reveal** 
+- **Hint, Check and Reveal**
 - **Keyboard navigation**: Arrow keys, number keys, shortcuts
 - **Responsive design**: Desktop and mobile layouts
 - **Auto-save**: Progress persists to localStorage
@@ -67,17 +69,17 @@ Bump VERSION:
 ```
 src/
 ├── components/
-│   ├── Controls/       # NumberPad, Timer, HintButton, Undo/Redo
+│   ├── Controls/       # NumberPad (number input, notes, undo/redo)
 │   ├── Grid/           # Sudoku grid and cell rendering
-│   ├── Layout/         # Main game layout container
-│   └── UI/             # Settings, Stats, Victory modal, Pause overlay
+│   ├── Layout/         # Main game layout orchestrator
+│   └── UI/             # Settings panel, Victory modal, Pause overlay
 ├── hooks/
 │   └── useKeyboard.ts  # Keyboard input handling
 ├── store/
 │   └── index.ts        # Zustand state management
 ├── styles/
-│   ├── global.css      # Base styles
-│   └── themes.css      # Theme definitions
+│   ├── global.css      # Base styles and CSS variables
+│   └── themes.css      # Theme-specific overrides
 ├── types/
 │   └── index.ts        # TypeScript interfaces
 ├── utils/
@@ -90,10 +92,19 @@ src/
 
 ## Tech Stack
 
-- React 18 + TypeScript
-- Vite
-- Zustand
-- CSS Modules
+- **React 19** + **TypeScript**
+- **Vite** - Build tool
+- **Zustand** - State management with localStorage persistence
+- **Lucide React** - Icons
+- **CSS Modules** - Scoped styling
+
+## Architecture
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed documentation including:
+- Component hierarchy diagrams
+- Data flow (Zustand store → components)
+- State management structure
+- User interaction flows
 
 ## License
 
