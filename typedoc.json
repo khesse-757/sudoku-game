@@ -1,0 +1,33 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/types/index.ts",
+    "src/store/index.ts",
+    "src/utils/sudoku.ts",
+    "src/utils/constants.ts",
+    "src/hooks/useKeyboard.ts",
+    "src/components/Grid/Grid.tsx",
+    "src/components/Grid/Cell.tsx",
+    "src/components/Controls/NumberPad.tsx",
+    "src/components/Layout/GameLayout.tsx",
+    "src/components/UI/VictoryModal.tsx",
+    "src/components/UI/PauseOverlay.tsx",
+    "src/components/UI/SettingsPanel.tsx",
+    "src/components/UI/SettingsButton.tsx"
+  ],
+  "out": "docs",
+  "name": "Sudoku Terminal API",
+  "readme": "README.md",
+  "includeVersion": true,
+  "categorizeByGroup": true,
+  "navigationLinks": {
+    "Play Game": "https://sudoku.kahdev.me",
+    "GitHub": "https://github.com/khesse-757/sudoku-game"
+  },
+  "plugin": ["typedoc-plugin-missing-exports"],
+  "exclude": ["**/*.module.css", "**/*.test.ts", "**/node_modules/**"],
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "skipErrorChecking": true,
+  "tsconfig": "tsconfig.app.json"
+}

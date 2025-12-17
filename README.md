@@ -2,7 +2,7 @@
 
 A terminal-themed Sudoku game built with React, TypeScript, and Vite.
 
-**[Play Live](https://sudoku.kahdev.me/)**
+**[Play Live](https://sudoku.kahdev.me/)** · **[API Docs](https://sudoku.kahdev.me/docs/)**
 
 ![Sudoku Terminal - Terminal-themed Sudoku game](sudoku-terminal.png)
 
@@ -33,7 +33,6 @@ A terminal-themed Sudoku game built with React, TypeScript, and Vite.
 | Pause | Click timer | Click timer |
 
 ## Installation
-
 ```bash
 git clone https://github.com/khesse-757/sudoku-game.git
 cd sudoku-game
@@ -41,7 +40,6 @@ npm install
 ```
 
 ## Development
-
 ```bash
 npm run dev
 ```
@@ -65,7 +63,6 @@ Bump VERSION:
 ```
 
 ## Project Structure
-
 ```
 src/
 ├── components/
@@ -98,13 +95,10 @@ src/
 - **Lucide React** - Icons
 - **CSS Modules** - Scoped styling
 
-## Architecture
+## Documentation
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed documentation including:
-- Component hierarchy diagrams
-- Data flow (Zustand store → components)
-- State management structure
-- User interaction flows
+- **[Architecture](ARCHITECTURE.md)** - Component hierarchy, data flow, state management
+- **[API Docs](https://sudoku.kahdev.me/docs/)** - TypeDoc-generated API reference
 
 ## License
 

@@ -1,14 +1,35 @@
+/**
+ * Sudoku puzzle generation and validation utilities.
+ * @module utils/sudoku
+ */
+
 import sudoku from 'sudoku';
 import type { Difficulty } from '../types';
 import { DIFFICULTY_CONFIG } from './constants';
 
+/**
+ * Result of puzzle generation containing both the puzzle and its solution.
+ */
 interface PuzzleResult {
+  /** The puzzle grid with some cells set to 0 (empty) */
   puzzle: number[][];
+  /** The complete solution grid */
   solution: number[][];
 }
 
 /**
- * Generate a new Sudoku puzzle with the given difficulty
+ * Generate a new Sudoku puzzle with the given difficulty.
+ * 
+ * Uses the `sudoku` npm package for generation, then converts
+ * from its format (1D array, 0-8 values) to our format (2D array, 1-9 values).
+ * 
+ * @param difficulty - The difficulty level determining how many clues to provide
+ * @returns Object containing both the puzzle and its solution
+ * 
+ * @example
+ * const { puzzle, solution } = generatePuzzle('medium');
+ * // puzzle[0][0] might be 0 (empty) or 1-9 (clue)
+ * // solution[0][0] is always 1-9
  */
 export const generatePuzzle = (difficulty: Difficulty): PuzzleResult => {
   // Generate a puzzle with the sudoku library
@@ -30,7 +51,11 @@ export const generatePuzzle = (difficulty: Difficulty): PuzzleResult => {
 };
 
 /**
- * Convert sudoku library format (1D array, 0-8) to our format (2D array, 1-9)
+ * Convert sudoku library format to our internal format.
+ * 
+ * @param puzzleArray - 1D array of 81 elements (0-8 or null)
+ * @returns 2D 9×9 grid with values 1-9 (0 for empty)
+ * @internal
  */
 const arrayToGrid = (puzzleArray: (number | null)[]): number[][] => {
   const grid: number[][] = [];
@@ -47,12 +72,17 @@ const arrayToGrid = (puzzleArray: (number | null)[]): number[][] => {
 };
 
 /**
- * Create a puzzle by removing numbers from the solution
+ * Create a puzzle by removing numbers from a complete solution.
+ * 
+ * @param solution - Complete 9×9 solution grid
+ * @param difficulty - Determines how many cells to remove
+ * @returns Puzzle grid with some cells set to 0
+ * @internal
  */
 const createPuzzleFromSolution = (solution: number[][], difficulty: Difficulty): number[][] => {
   const puzzle = solution.map(row => [...row]);
   const config = DIFFICULTY_CONFIG[difficulty];
-  const cellsToRemove = 81 - config.clues; // Use 'clues' not 'givens'
+  const cellsToRemove = 81 - config.clues;
 
   // Get all cell positions
   const positions: [number, number][] = [];
@@ -78,7 +108,20 @@ const createPuzzleFromSolution = (solution: number[][], difficulty: Difficulty):
 };
 
 /**
- * Validate if a number can be placed at a position
+ * Validate if a number can be placed at a position without conflicts.
+ * 
+ * Checks row, column, and 3×3 box for duplicates.
+ * 
+ * @param grid - Current grid state (values 0-9)
+ * @param row - Row index (0-8)
+ * @param col - Column index (0-8)
+ * @param num - Number to validate (1-9)
+ * @returns True if the move is valid (no conflicts)
+ * 
+ * @example
+ * if (isValidMove(grid, 0, 0, 5)) {
+ *   // Safe to place 5 at position (0,0)
+ * }
  */
 export const isValidMove = (grid: number[][], row: number, col: number, num: number): boolean => {
   // Check row
@@ -104,7 +147,11 @@ export const isValidMove = (grid: number[][], row: number, col: number, num: num
 };
 
 /**
- * Check if the puzzle is completely and correctly solved
+ * Check if the puzzle is completely and correctly solved.
+ * 
+ * @param grid - Current user grid values
+ * @param solution - Complete solution to compare against
+ * @returns True if every cell matches the solution
  */
 export const isPuzzleComplete = (grid: number[][], solution: number[][]): boolean => {
   for (let r = 0; r < 9; r++) {
