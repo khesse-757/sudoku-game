@@ -93,7 +93,6 @@ src/
 - React 18 + TypeScript
 - Vite
 - Zustand
-- Framer Motion
 - CSS Modules
 
 ## License
