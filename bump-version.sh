@@ -38,14 +38,19 @@ esac
 
 echo ""
 echo "Bumping version: $CURRENT_VERSION → $NEW_VERSION"
-echo "$NEW_VERSION" > VERSION
 
-echo ""
-echo "✓ VERSION file updated to $NEW_VERSION"
+# Update VERSION file
+echo "$NEW_VERSION" > VERSION
+echo "✓ VERSION file updated"
+
+# Update package.json
+npm version "$NEW_VERSION" --no-git-tag-version --allow-same-version
+echo "✓ package.json updated"
+
 echo ""
 echo "Next steps:"
 echo "  1. Review your changes"
-echo "  2. git add VERSION"
+echo "  2. git add VERSION package.json package-lock.json"
 echo "  3. git commit -m 'Bump version to $NEW_VERSION'"
 echo "  4. git push origin main"
 echo ""
