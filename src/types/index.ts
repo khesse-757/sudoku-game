@@ -4,9 +4,9 @@ export type ThemeName = 'light' | 'dark' | 'green' | 'amber' | 'paper' | 'monoch
 export type FontFamily = 'jetbrains' | 'fira' | 'ibm' | 'courier';
 
 export interface Cell {
-  value: number; // 0 = empty, 1-9 = filled
-  isGiven: boolean; // True if part of original puzzle
-  notes: number[]; // Pencil marks
+  value: number;      // 0 = empty, 1-9 = filled
+  isGiven: boolean;   // True if part of original puzzle
+  notes: number[];    // Pencil marks
 }
 
 export interface GameplaySettings {
@@ -37,17 +37,6 @@ export interface SettingsState {
   theme: ThemeName;
   font: FontFamily;
   gameplay: GameplaySettings;
-  animations: {
-    cellHighlight: boolean;
-    numberPlacement: boolean;
-    transitions: boolean;
-  };
-  audio: {
-    sfxEnabled: boolean;
-    sfxVolume: number;
-    musicEnabled: boolean;
-    musicVolume: number;
-  };
 }
 
 export interface Statistics {
