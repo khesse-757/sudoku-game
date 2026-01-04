@@ -1,4 +1,4 @@
-import { Trophy, Clock, RotateCcw, Play } from 'lucide-react';
+import { Trophy, Clock, RotateCcw } from 'lucide-react';
 import { useStore } from '../../store';
 import type { Difficulty } from '../../types';
 import styles from './VictoryModal.module.css';

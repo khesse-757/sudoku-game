@@ -261,7 +261,6 @@ export const useStore = create<Store>()(
       setNumber: (num) => {
         const state = get();
         const { selectedCell, userGrid, solution, isComplete } = state.game;
-        const autoCheckMistakes = state.settings.gameplay?.autoCheckMistakes ?? true;
         const autoNotes = state.settings.gameplay?.autoNotes ?? false;
 
         if (!selectedCell || isComplete) return;
