@@ -206,6 +206,22 @@
   min-height: 44px;
 }
 
+/* On mobile, center notes mode numbers instead of positioning them */
+.mobilePad .numberButton.pos1,
+.mobilePad .numberButton.pos2,
+.mobilePad .numberButton.pos3,
+.mobilePad .numberButton.pos4,
+.mobilePad .numberButton.pos5,
+.mobilePad .numberButton.pos6,
+.mobilePad .numberButton.pos7,
+.mobilePad .numberButton.pos8,
+.mobilePad .numberButton.pos9 {
+  justify-content: center;
+  align-items: center;
+  font-size: 1.1rem;
+  padding: 0.6rem 0.5rem;
+}
+
 .mobileActionsRow {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
