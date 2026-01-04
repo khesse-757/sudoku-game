@@ -39,7 +39,38 @@ Sudoku Terminal is a React-based Sudoku game with a terminal/retro aesthetic. Th
 | **State** | Zustand | Lightweight state management |
 | **Icons** | Lucide React | Icon library |
 | **Styling** | CSS Modules | Scoped component styles |
-| **Puzzle Gen** | `sudoku` (npm) | Puzzle generation and solving |
+| **Puzzle Gen** | `sudoku-core` | Logic-based puzzle generation (no guessing) |
+
+---
+
+## Puzzle Generation
+
+Puzzles are generated using [sudoku-core](https://github.com/komeilmehranfar/sudoku-core), which guarantees all puzzles are solvable using logic techniques (no guessing/backtracking required).
+
+### Difficulty Levels
+
+Difficulty is determined by which solving strategies are required:
+
+| Level | Strategies Required | Hints Allowed |
+|-------|---------------------|---------------|
+| Easy | Single Remaining Cell, Single Candidate Cell | 5 |
+| Medium | + Single Candidate Value, basic elimination | 3 |
+| Hard | + Pointing Elimination, advanced techniques | 0 |
+
+The package uses a scoring system based on strategy frequency and complexity. Higher difficulties require more advanced techniques applied more often.
+
+### Generation Flow
+
+```mermaid
+flowchart LR
+    generate["generate(difficulty)"] --> board["81-element array<br/>(1-9 or null)"]
+    board --> solve["solve(board)"]
+    solve --> solution["Complete solution"]
+    board --> convert1["boardToGrid()"]
+    solution --> convert2["boardToGrid()"]
+    convert1 --> puzzle["puzzle: number[][]"]
+    convert2 --> sol["solution: number[][]"]
+```
 
 ---
 
@@ -205,9 +236,11 @@ graph TB
 
 ```typescript
 interface Cell {
-  value: number;      // 0 = empty, 1-9 = filled
-  isGiven: boolean;   // true if part of original puzzle
-  notes: number[];    // pencil marks array
+  value: number;              // 0 = empty, 1-9 = filled
+  isGiven: boolean;           // true if part of original puzzle
+  manualNotes: number[];      // manual pencil marks (passive layer)
+  autoNotes: number[];        // auto-calculated candidates (reactive layer)
+  userEditedInAuto: number[]; // tracks manual edits in auto mode
 }
 
 type Difficulty = 'easy' | 'medium' | 'hard';
@@ -224,6 +257,14 @@ interface GameplaySettings {
   autoNotes: boolean;           // Auto-calculate pencil marks
 }
 ```
+
+### Dual-Layer Notes System
+
+The game maintains two independent candidate layers:
+- **Manual notes** (`manualNotes`): Passive scratchpad with no algorithmic intervention
+- **Auto notes** (`autoNotes`): Reactive layer that auto-prunes when pen values are placed
+
+User edits made in auto mode are tracked in `userEditedInAuto` and protected from auto-pruning.
 
 ### Store Actions
 
@@ -523,7 +564,9 @@ All grid mutations create new arrays to ensure React detects changes:
 const cloneGrid = (grid: Cell[][]): Cell[][] => {
   return grid.map(row => row.map(cell => ({
     ...cell,
-    notes: [...cell.notes],  // Deep clone notes array
+    manualNotes: [...cell.manualNotes],
+    autoNotes: [...cell.autoNotes],
+    userEditedInAuto: [...cell.userEditedInAuto],
   })));
 };
 ```

@@ -19,8 +19,30 @@ Sudoku Terminal is a React-based Sudoku game with a terminal/retro aesthetic. It
 | State      | Zustand          | Single store with persist middleware     |
 | Icons      | Lucide React     | Icon library                             |
 | Styling    | CSS Modules      | Scoped component styles                  |
-| Puzzle Gen | `sudoku` (npm)   | External library for generation/solving  |
+| Puzzle Gen | `sudoku-core`    | Logic-based generation (no guessing)     |
 | Testing    | Vitest           | Use `-- --run` flag to avoid watch mode  |
+
+## Puzzle Generation
+
+Puzzles are generated using [sudoku-core](https://github.com/komeilmehranfar/sudoku-core), which guarantees all puzzles are solvable using logic techniques (no guessing required).
+
+### Difficulty Levels
+
+Difficulty is determined by which solving strategies are required:
+
+| Level  | Strategies Required |
+|--------|---------------------|
+| Easy   | Single Remaining Cell, Single Candidate Cell |
+| Medium | + Single Candidate Value, basic elimination |
+| Hard   | + Pointing Elimination, advanced techniques |
+
+The package uses a scoring system based on strategy frequency and complexity. Higher difficulties require more advanced techniques applied more often.
+
+### How It Works
+
+1. `generate(difficulty)` creates a puzzle solvable by logic at the specified level
+2. `solve(board)` returns the complete solution
+3. Puzzles are converted from 81-element arrays to 9x9 grids
 
 ## Commands
 
@@ -175,14 +197,24 @@ The store persists to localStorage under key `sudoku-storage`.
 
 ```typescript
 interface Cell {
-  value: number;      // 0 = empty, 1-9 = filled
-  isGiven: boolean;   // true if part of original puzzle
-  notes: number[];    // pencil marks
+  value: number;           // 0 = empty, 1-9 = filled
+  isGiven: boolean;        // true if part of original puzzle
+  manualNotes: number[];   // manual pencil marks (passive layer)
+  autoNotes: number[];     // auto-calculated candidates (reactive layer)
+  userEditedInAuto: number[]; // tracks manual edits in auto mode
 }
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 type ThemeName = 'light' | 'dark' | 'green' | 'amber' | 'paper' | 'monochrome' | 'ocean' | 'clean';
 ```
+
+### Dual-Layer Notes System
+
+The game has two independent candidate layers:
+- **Manual notes**: Passive scratchpad, no algorithmic intervention
+- **Auto notes**: Reactive layer that auto-prunes when pen values are placed
+
+User edits in auto mode are tracked and protected from auto-pruning.
 
 ### Storage Schema Version
 

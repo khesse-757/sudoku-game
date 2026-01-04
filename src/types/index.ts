@@ -5,13 +5,16 @@
 
 /**
  * Difficulty level for puzzle generation.
- * Controls the number of pre-filled cells (clues).
- * 
- * | Level | Clues | Hints Allowed |
- * |-------|-------|---------------|
- * | easy | 45 | 5 |
- * | medium | 35 | 3 |
- * | hard | 28 | 0 |
+ * Determined by which solving strategies are required (not clue count).
+ *
+ * | Level  | Strategies Required                              | Hints |
+ * |--------|--------------------------------------------------|-------|
+ * | easy   | Single Remaining Cell, Single Candidate Cell     | 5     |
+ * | medium | + Single Candidate Value, basic elimination      | 3     |
+ * | hard   | + Pointing Elimination, advanced techniques      | 0     |
+ *
+ * Puzzles are generated using sudoku-core, which guarantees all puzzles
+ * are solvable using logic techniques (no guessing required).
  */
 export type Difficulty = 'easy' | 'medium' | 'hard';
 

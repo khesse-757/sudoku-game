@@ -3,9 +3,8 @@
  * @module utils/sudoku
  */
 
-import sudoku from 'sudoku';
+import { generate, solve } from 'sudoku-core';
 import type { Difficulty } from '../types';
-import { DIFFICULTY_CONFIG } from './constants';
 
 /**
  * Result of puzzle generation containing both the puzzle and its solution.
@@ -19,92 +18,53 @@ interface PuzzleResult {
 
 /**
  * Generate a new Sudoku puzzle with the given difficulty.
- * 
- * Uses the `sudoku` npm package for generation, then converts
- * from its format (1D array, 0-8 values) to our format (2D array, 1-9 values).
- * 
- * @param difficulty - The difficulty level determining how many clues to provide
+ *
+ * Uses the `sudoku-core` package which generates puzzles solvable by
+ * logic techniques (no guessing required). Difficulty is determined by
+ * the solving strategies needed:
+ * - easy: naked singles, hidden singles
+ * - medium: + naked pairs, pointing pairs
+ * - hard: + advanced techniques
+ *
+ * @param difficulty - The difficulty level determining required solving techniques
  * @returns Object containing both the puzzle and its solution
- * 
+ *
  * @example
  * const { puzzle, solution } = generatePuzzle('medium');
  * // puzzle[0][0] might be 0 (empty) or 1-9 (clue)
  * // solution[0][0] is always 1-9
  */
 export const generatePuzzle = (difficulty: Difficulty): PuzzleResult => {
-  // Generate a puzzle with the sudoku library
-  const puzzleArray = sudoku.makepuzzle();
-  const solutionArray = sudoku.solvepuzzle(puzzleArray);
+  // generate() returns Board (81-element array, values 1-9 or null for empty)
+  const board = generate(difficulty);
 
-  if (!solutionArray) {
-    // Fallback: try again if solve fails
-    return generatePuzzle(difficulty);
-  }
+  // solve() returns { solved: boolean, board: Board }
+  const result = solve(board);
 
-  // Convert to 2D arrays (sudoku library uses 1D arrays with null for empty, 0-8 for values)
-  const solution = arrayToGrid(solutionArray);
-  
-  // Create puzzle by removing cells based on difficulty
-  const puzzle = createPuzzleFromSolution(solution, difficulty);
+  // Convert to our 2D grid format
+  const puzzle = boardToGrid(board);
+  const solution = boardToGrid(result.board!);
 
   return { puzzle, solution };
 };
 
 /**
- * Convert sudoku library format to our internal format.
- * 
- * @param puzzleArray - 1D array of 81 elements (0-8 or null)
- * @returns 2D 9×9 grid with values 1-9 (0 for empty)
+ * Convert sudoku-core Board format to our internal 2D grid format.
+ *
+ * @param board - 81-element array (values 1-9 or null for empty)
+ * @returns 2D 9x9 grid with values 1-9 (0 for empty)
  * @internal
  */
-const arrayToGrid = (puzzleArray: (number | null)[]): number[][] => {
+const boardToGrid = (board: (number | null)[]): number[][] => {
   const grid: number[][] = [];
   for (let i = 0; i < 9; i++) {
     const row: number[] = [];
     for (let j = 0; j < 9; j++) {
-      const value = puzzleArray[i * 9 + j];
-      // Convert from 0-8 to 1-9, null becomes 0
-      row.push(value !== null ? value + 1 : 0);
+      row.push(board[i * 9 + j] ?? 0);
     }
     grid.push(row);
   }
   return grid;
-};
-
-/**
- * Create a puzzle by removing numbers from a complete solution.
- * 
- * @param solution - Complete 9×9 solution grid
- * @param difficulty - Determines how many cells to remove
- * @returns Puzzle grid with some cells set to 0
- * @internal
- */
-const createPuzzleFromSolution = (solution: number[][], difficulty: Difficulty): number[][] => {
-  const puzzle = solution.map(row => [...row]);
-  const config = DIFFICULTY_CONFIG[difficulty];
-  const cellsToRemove = 81 - config.clues;
-
-  // Get all cell positions
-  const positions: [number, number][] = [];
-  for (let r = 0; r < 9; r++) {
-    for (let c = 0; c < 9; c++) {
-      positions.push([r, c]);
-    }
-  }
-
-  // Shuffle positions using Fisher-Yates
-  for (let i = positions.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [positions[i], positions[j]] = [positions[j], positions[i]];
-  }
-
-  // Remove cells
-  for (let i = 0; i < cellsToRemove && i < positions.length; i++) {
-    const [r, c] = positions[i];
-    puzzle[r][c] = 0;
-  }
-
-  return puzzle;
 };
 
 /**

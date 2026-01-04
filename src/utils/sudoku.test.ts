@@ -16,6 +16,22 @@ describe('generatePuzzle', () => {
       }
     }
   });
+
+  it('should generate puzzles at all difficulty levels', () => {
+    const difficulties = ['easy', 'medium', 'hard'] as const;
+
+    for (const difficulty of difficulties) {
+      const { puzzle, solution } = generatePuzzle(difficulty);
+
+      // Puzzle should have empty cells
+      const emptyCells = puzzle.flat().filter(c => c === 0).length;
+      expect(emptyCells).toBeGreaterThan(0);
+
+      // Solution should be complete
+      const completeCells = solution.flat().filter(c => c >= 1 && c <= 9).length;
+      expect(completeCells).toBe(81);
+    }
+  }, 30000);
 });
 
 describe('isValidMove', () => {

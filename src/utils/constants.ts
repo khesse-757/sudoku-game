@@ -2,9 +2,9 @@ export const GRID_SIZE = 9;
 export const BOX_SIZE = 3;
 
 export const DIFFICULTY_CONFIG = {
-  easy: { clues: 45, hintsAllowed: 5 },
-  medium: { clues: 35, hintsAllowed: 3 },
-  hard: { clues: 28, hintsAllowed: 0 },
+  easy: { hintsAllowed: 5 },
+  medium: { hintsAllowed: 3 },
+  hard: { hintsAllowed: 0 },
 } as const;
 
 // All 8 themes matching SettingsPanel

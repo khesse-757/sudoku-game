@@ -8,7 +8,7 @@ A terminal-themed Sudoku game built with React, TypeScript, and Vite.
 
 ## Features
 
-- **Three difficulty levels** with unique, solvable puzzles
+- **Three difficulty levels** with logic-based puzzles (no guessing required)
 - **Eight themes**: Light, Dark, Clean, Paper, Green Phosphor, Amber CRT, Ocean, Monochrome
 - **Auto notes**: Automatically track possible numbers per cell
 - **Pencil mode**: Manual corner notes when auto notes is off
@@ -92,6 +92,7 @@ src/
 - **React 19** + **TypeScript**
 - **Vite** - Build tool
 - **Zustand** - State management with localStorage persistence
+- **sudoku-core** - Logic-based puzzle generation
 - **Lucide React** - Icons
 - **CSS Modules** - Scoped styling
 
