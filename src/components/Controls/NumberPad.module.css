@@ -58,6 +58,30 @@
   opacity: 0.6;
 }
 
+/* Notes mode: position numbers to match pencil mark positions in cells */
+.numberButton.pos1,
+.numberButton.pos2,
+.numberButton.pos3,
+.numberButton.pos4,
+.numberButton.pos5,
+.numberButton.pos6,
+.numberButton.pos7,
+.numberButton.pos8,
+.numberButton.pos9 {
+  font-size: 0.9rem;
+  padding: 0.5rem;
+}
+
+.numberButton.pos1 { justify-content: flex-start; align-items: flex-start; }
+.numberButton.pos2 { justify-content: center; align-items: flex-start; }
+.numberButton.pos3 { justify-content: flex-end; align-items: flex-start; }
+.numberButton.pos4 { justify-content: flex-start; align-items: center; }
+.numberButton.pos5 { justify-content: center; align-items: center; }
+.numberButton.pos6 { justify-content: flex-end; align-items: center; }
+.numberButton.pos7 { justify-content: flex-start; align-items: flex-end; }
+.numberButton.pos8 { justify-content: center; align-items: flex-end; }
+.numberButton.pos9 { justify-content: flex-end; align-items: flex-end; }
+
 /* Action buttons row */
 .actions {
   display: grid;

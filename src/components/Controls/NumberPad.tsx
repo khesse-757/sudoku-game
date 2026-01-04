@@ -110,12 +110,13 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
         <div className={styles.numbers}>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
             const isCompleted = !isInNotesMode && completedNumbers.has(num);
+            const positionClass = isInNotesMode ? styles[`pos${num}`] : '';
             return (
               <button
                 key={num}
                 onClick={() => handleNumberClick(num)}
                 onMouseDown={(e) => e.preventDefault()}
-                className={`${styles.numberButton} ${isCompleted ? styles.completed : ''}`}
+                className={`${styles.numberButton} ${isCompleted ? styles.completed : ''} ${positionClass}`}
                 disabled={!selectedCell || isDisabled}
               >
                 {num}
@@ -189,12 +190,13 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
         <div className={styles.mobileRow}>
           {[1, 2, 3, 4, 5].map((num) => {
             const isCompleted = !isInNotesMode && completedNumbers.has(num);
+            const positionClass = isInNotesMode ? styles[`pos${num}`] : '';
             return (
               <button
                 key={num}
                 onClick={() => handleNumberClick(num)}
                 onMouseDown={(e) => e.preventDefault()}
-                className={`${styles.numberButton} ${isCompleted ? styles.completed : ''}`}
+                className={`${styles.numberButton} ${isCompleted ? styles.completed : ''} ${positionClass}`}
                 disabled={!selectedCell || isDisabled}
               >
                 {num}
@@ -205,12 +207,13 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
         <div className={styles.mobileRow}>
           {[6, 7, 8, 9].map((num) => {
             const isCompleted = !isInNotesMode && completedNumbers.has(num);
+            const positionClass = isInNotesMode ? styles[`pos${num}`] : '';
             return (
               <button
                 key={num}
                 onClick={() => handleNumberClick(num)}
                 onMouseDown={(e) => e.preventDefault()}
-                className={`${styles.numberButton} ${isCompleted ? styles.completed : ''}`}
+                className={`${styles.numberButton} ${isCompleted ? styles.completed : ''} ${positionClass}`}
                 disabled={!selectedCell || isDisabled}
               >
                 {num}
