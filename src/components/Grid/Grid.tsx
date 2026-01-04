@@ -46,7 +46,8 @@ const Grid = () => {
             <Cell
               key={`${rowIndex}-${colIndex}`}
               value={cell.value}
-              notes={cell.notes}
+              manualNotes={cell.manualNotes}
+              autoNotes={cell.autoNotes}
               isGiven={cell.isGiven}
               isSelected={
                 selectedCell !== null &&

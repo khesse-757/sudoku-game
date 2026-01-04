@@ -28,21 +28,19 @@ export type FontFamily = 'jetbrains' | 'fira' | 'ibm' | 'courier';
 
 /**
  * Represents a single cell in the Sudoku grid.
- * 
+ *
+ * The cell maintains two independent candidate layers:
+ * - manualNotes: Passive scratchpad, no algorithmic intervention
+ * - autoNotes: Reactive layer that auto-prunes when pen values are placed
+ *
  * @example
- * // Empty cell with pencil marks
+ * // Empty cell with candidates
  * const cell: Cell = {
  *   value: 0,
  *   isGiven: false,
- *   notes: [1, 4, 7]
- * };
- * 
- * @example
- * // Pre-filled cell (part of puzzle)
- * const given: Cell = {
- *   value: 5,
- *   isGiven: true,
- *   notes: []
+ *   manualNotes: [1, 4, 7],
+ *   autoNotes: [1, 2, 4, 7],
+ *   userEditedInAuto: [2]
  * };
  */
 export interface Cell {
@@ -50,8 +48,12 @@ export interface Cell {
   value: number;
   /** True if this cell was part of the original puzzle (cannot be edited) */
   isGiven: boolean;
-  /** Pencil marks / candidate numbers */
-  notes: number[];
+  /** Manual pencil marks (passive layer, no auto-pruning) */
+  manualNotes: number[];
+  /** Auto-calculated candidates (reactive layer, auto-prunes on pen entry) */
+  autoNotes: number[];
+  /** Tracks candidates user has manually edited in auto mode (protected from pruning) */
+  userEditedInAuto: number[];
 }
 
 /**

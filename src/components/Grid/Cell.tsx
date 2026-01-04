@@ -14,7 +14,8 @@ const defaultGameplay = {
 
 interface CellProps {
   value: number;
-  notes: number[];
+  manualNotes: number[];
+  autoNotes: number[];
   isGiven: boolean;
   isSelected: boolean;
   row: number;
@@ -22,11 +23,14 @@ interface CellProps {
   onClick: () => void;
 }
 
-const Cell = ({ value, notes, isGiven, isSelected, row, col, onClick }: CellProps) => {
+const Cell = ({ value, manualNotes, autoNotes, isGiven, isSelected, row, col, onClick }: CellProps) => {
   const selectedCell = useStore((state) => state.game.selectedCell);
   const userGrid = useStore((state) => state.game.userGrid);
   const gameplay = useStore((state) => state.settings.gameplay) ?? defaultGameplay;
   const getConflicts = useStore((state) => state.getConflicts);
+
+  // Display the appropriate notes layer based on autoNotes setting
+  const displayNotes = gameplay.autoNotes ? autoNotes : manualNotes;
 
   // Determine highlighting states
   let isInRowOrColumn = false;
@@ -108,14 +112,14 @@ const Cell = ({ value, notes, isGiven, isSelected, row, col, onClick }: CellProp
     <div className={classNames} onClick={onClick}>
       {value !== 0 ? (
         <span className={styles.value}>{value}</span>
-      ) : notes.length > 0 ? (
+      ) : displayNotes.length > 0 ? (
         <div className={styles.notes}>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
             <span
               key={n}
-              className={notes.includes(n) ? styles.noteActive : styles.noteInactive}
+              className={displayNotes.includes(n) ? styles.noteActive : styles.noteInactive}
             >
-              {notes.includes(n) ? n : ''}
+              {displayNotes.includes(n) ? n : ''}
             </span>
           ))}
         </div>

@@ -5,7 +5,7 @@ import { DIFFICULTY_CONFIG } from '../utils/constants';
 import { generatePuzzle } from '../utils/sudoku';
 
 // Current schema version - increment when making breaking changes to STATE structure
-const STORAGE_VERSION = 3;
+const STORAGE_VERSION = 5;
 
 interface GameState {
   puzzle: number[][];
@@ -80,7 +80,9 @@ const createEmptyGrid = (): Cell[][] => {
     Array(9).fill(null).map(() => ({
       value: 0,
       isGiven: false,
-      notes: [],
+      manualNotes: [],
+      autoNotes: [],
+      userEditedInAuto: [],
     }))
   );
 };
@@ -88,7 +90,9 @@ const createEmptyGrid = (): Cell[][] => {
 const cloneGrid = (grid: Cell[][]): Cell[][] => {
   return grid.map(row => row.map(cell => ({
     ...cell,
-    notes: [...cell.notes],
+    manualNotes: [...cell.manualNotes],
+    autoNotes: [...cell.autoNotes],
+    userEditedInAuto: [...cell.userEditedInAuto],
   })));
 };
 
@@ -174,16 +178,51 @@ const hasConflictAt = (grid: Cell[][], row: number, col: number, value: number):
   return false;
 };
 
-// Update all auto notes in the grid
-const updateAllAutoNotes = (grid: Cell[][]): Cell[][] => {
+// Prune a specific number from peer cells' autoNotes when a pen value is placed
+// Only prunes if the number is NOT user-edited in that cell
+const pruneAutoNotesForPeers = (
+  grid: Cell[][],
+  placedRow: number,
+  placedCol: number,
+  placedValue: number
+): Cell[][] => {
   const newGrid = cloneGrid(grid);
-  for (let row = 0; row < 9; row++) {
-    for (let col = 0; col < 9; col++) {
-      if (newGrid[row][col].value === 0) {
-        newGrid[row][col].notes = calculateAutoNotes(newGrid, row, col);
+
+  // Get all peer cells (same row, column, or box)
+  const peers: [number, number][] = [];
+
+  // Row peers
+  for (let c = 0; c < 9; c++) {
+    if (c !== placedCol) peers.push([placedRow, c]);
+  }
+
+  // Column peers
+  for (let r = 0; r < 9; r++) {
+    if (r !== placedRow) peers.push([r, placedCol]);
+  }
+
+  // Box peers
+  const boxRow = Math.floor(placedRow / 3) * 3;
+  const boxCol = Math.floor(placedCol / 3) * 3;
+  for (let r = boxRow; r < boxRow + 3; r++) {
+    for (let c = boxCol; c < boxCol + 3; c++) {
+      if (r !== placedRow || c !== placedCol) {
+        // Avoid duplicates
+        if (!peers.some(([pr, pc]) => pr === r && pc === c)) {
+          peers.push([r, c]);
+        }
       }
     }
   }
+
+  // Prune the placed value from each peer's autoNotes (if not user-edited)
+  for (const [r, c] of peers) {
+    const cell = newGrid[r][c];
+    if (cell.value === 0 && !cell.userEditedInAuto.includes(placedValue)) {
+      cell.autoNotes = cell.autoNotes.filter(n => n !== placedValue);
+    }
+  }
+
   return newGrid;
 };
 
@@ -239,7 +278,7 @@ export const useStore = create<Store>()(
 
       startNewGame: (difficulty) => {
         const { puzzle, solution } = generatePuzzle(difficulty);
-        let userGrid = createEmptyGrid();
+        const userGrid = createEmptyGrid();
 
         // Fill in the given numbers
         for (let row = 0; row < 9; row++) {
@@ -248,16 +287,24 @@ export const useStore = create<Store>()(
               userGrid[row][col] = {
                 value: puzzle[row][col],
                 isGiven: true,
-                notes: [],
+                manualNotes: [],
+                autoNotes: [],
+                userEditedInAuto: [],
               };
             }
           }
         }
 
-        // If auto notes is enabled, calculate initial notes
-        const autoNotes = get().settings.gameplay?.autoNotes ?? false;
-        if (autoNotes) {
-          userGrid = updateAllAutoNotes(userGrid);
+        // If auto notes is enabled, calculate initial candidates
+        const autoNotesEnabled = get().settings.gameplay?.autoNotes ?? false;
+        if (autoNotesEnabled) {
+          for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+              if (userGrid[row][col].value === 0) {
+                userGrid[row][col].autoNotes = calculateAutoNotes(userGrid, row, col);
+              }
+            }
+          }
         }
 
         set({
@@ -287,7 +334,7 @@ export const useStore = create<Store>()(
       setNumber: (num) => {
         const state = get();
         const { selectedCell, userGrid, solution, isComplete } = state.game;
-        const autoNotes = state.settings.gameplay?.autoNotes ?? false;
+        const autoNotesEnabled = state.settings.gameplay?.autoNotes ?? false;
 
         if (!selectedCell || isComplete) return;
 
@@ -298,12 +345,14 @@ export const useStore = create<Store>()(
         newGrid[row][col] = {
           ...newGrid[row][col],
           value: num,
-          notes: [],
+          // Clear auto layer on placed cell, but preserve manual notes (passive layer)
+          autoNotes: [],
+          userEditedInAuto: [],
         };
 
-        // If auto notes is enabled, update all notes
-        if (autoNotes) {
-          newGrid = updateAllAutoNotes(newGrid);
+        // If auto notes is enabled, prune this number from peer cells
+        if (autoNotesEnabled && num !== 0) {
+          newGrid = pruneAutoNotesForPeers(newGrid, row, col, num);
         }
 
         // Check if the number creates a conflict (duplicate in row, column, or box)
@@ -351,24 +400,23 @@ export const useStore = create<Store>()(
       clearCell: () => {
         const state = get();
         const { selectedCell, userGrid, isComplete } = state.game;
-        const autoNotes = state.settings.gameplay?.autoNotes ?? false;
+        const autoNotesEnabled = state.settings.gameplay?.autoNotes ?? false;
 
         if (!selectedCell || isComplete) return;
 
         const [row, col] = selectedCell;
         if (userGrid[row][col].isGiven) return;
 
-        let newGrid = cloneGrid(userGrid);
+        const newGrid = cloneGrid(userGrid);
+
+        // Clear value and reset auto layer, but preserve manual notes
         newGrid[row][col] = {
           ...newGrid[row][col],
           value: 0,
-          notes: [],
+          autoNotes: autoNotesEnabled ? calculateAutoNotes(newGrid, row, col) : [],
+          userEditedInAuto: [],
+          // manualNotes preserved from spread
         };
-
-        // If auto notes is enabled, update all notes
-        if (autoNotes) {
-          newGrid = updateAllAutoNotes(newGrid);
-        }
 
         const newHistory = state.history.slice(0, state.historyIndex + 1);
         newHistory.push(cloneGrid(newGrid));
@@ -383,10 +431,7 @@ export const useStore = create<Store>()(
       toggleNote: (num) => {
         const state = get();
         const { selectedCell, userGrid, isComplete } = state.game;
-        const autoNotes = state.settings.gameplay?.autoNotes ?? false;
-
-        // Don't allow manual notes when auto notes is on
-        if (autoNotes) return;
+        const autoNotesEnabled = state.settings.gameplay?.autoNotes ?? false;
 
         if (!selectedCell || isComplete) return;
 
@@ -394,16 +439,42 @@ export const useStore = create<Store>()(
         if (userGrid[row][col].isGiven || userGrid[row][col].value !== 0) return;
 
         const newGrid = cloneGrid(userGrid);
-        const notes = [...newGrid[row][col].notes];
+        const cell = newGrid[row][col];
 
-        if (notes.includes(num)) {
-          notes.splice(notes.indexOf(num), 1);
+        if (autoNotesEnabled) {
+          // Toggle in autoNotes layer and track as user-edited
+          const autoNotes = [...cell.autoNotes];
+          const userEdited = [...cell.userEditedInAuto];
+
+          if (autoNotes.includes(num)) {
+            // Remove from autoNotes
+            autoNotes.splice(autoNotes.indexOf(num), 1);
+          } else {
+            // Add to autoNotes
+            autoNotes.push(num);
+            autoNotes.sort((a, b) => a - b);
+          }
+
+          // Track this number as user-edited (protects from auto-pruning)
+          if (!userEdited.includes(num)) {
+            userEdited.push(num);
+            userEdited.sort((a, b) => a - b);
+          }
+
+          newGrid[row][col] = { ...cell, autoNotes, userEditedInAuto: userEdited };
         } else {
-          notes.push(num);
-          notes.sort();
-        }
+          // Toggle in manualNotes layer
+          const manualNotes = [...cell.manualNotes];
 
-        newGrid[row][col] = { ...newGrid[row][col], notes };
+          if (manualNotes.includes(num)) {
+            manualNotes.splice(manualNotes.indexOf(num), 1);
+          } else {
+            manualNotes.push(num);
+            manualNotes.sort((a, b) => a - b);
+          }
+
+          newGrid[row][col] = { ...cell, manualNotes };
+        }
 
         const newHistory = state.history.slice(0, state.historyIndex + 1);
         newHistory.push(cloneGrid(newGrid));
@@ -470,14 +541,18 @@ export const useStore = create<Store>()(
         if (targetRow === -1) return;
 
         let newGrid = cloneGrid(userGrid);
+        const hintValue = solution[targetRow][targetCol];
         newGrid[targetRow][targetCol] = {
-          value: solution[targetRow][targetCol],
-          isGiven: false,
-          notes: [],
+          ...newGrid[targetRow][targetCol],
+          value: hintValue,
+          // Preserve manual notes (passive layer)
+          autoNotes: [],
+          userEditedInAuto: [],
         };
 
-        if (autoNotes) {
-          newGrid = updateAllAutoNotes(newGrid);
+        // Prune this value from peer cells' autoNotes
+        if (autoNotes && hintValue !== 0) {
+          newGrid = pruneAutoNotesForPeers(newGrid, targetRow, targetCol, hintValue);
         }
 
         const hasWon = checkWin(newGrid, solution);
@@ -570,14 +645,18 @@ export const useStore = create<Store>()(
         if (userGrid[row][col].value === solution[row][col]) return false;
 
         let newGrid = cloneGrid(userGrid);
+        const revealedValue = solution[row][col];
         newGrid[row][col] = {
-          value: solution[row][col],
-          isGiven: false,
-          notes: [],
+          ...newGrid[row][col],
+          value: revealedValue,
+          // Preserve manual notes (passive layer)
+          autoNotes: [],
+          userEditedInAuto: [],
         };
 
-        if (autoNotes) {
-          newGrid = updateAllAutoNotes(newGrid);
+        // Prune this value from peer cells' autoNotes
+        if (autoNotes && revealedValue !== 0) {
+          newGrid = pruneAutoNotesForPeers(newGrid, row, col, revealedValue);
         }
 
         const hasWon = checkWin(newGrid, solution);
@@ -626,7 +705,9 @@ export const useStore = create<Store>()(
             newGrid[row][col] = {
               value: solution[row][col],
               isGiven: state.game.userGrid[row][col].isGiven,
-              notes: [],
+              manualNotes: [],
+              autoNotes: [],
+              userEditedInAuto: [],
             };
           }
         }
@@ -643,23 +724,32 @@ export const useStore = create<Store>()(
       resetPuzzle: () => {
         const state = get();
         const { puzzle } = state.game;
-        const autoNotes = state.settings.gameplay?.autoNotes ?? false;
+        const autoNotesEnabled = state.settings.gameplay?.autoNotes ?? false;
 
-        let userGrid = createEmptyGrid();
+        const userGrid = createEmptyGrid();
         for (let row = 0; row < 9; row++) {
           for (let col = 0; col < 9; col++) {
             if (puzzle[row][col] !== 0) {
               userGrid[row][col] = {
                 value: puzzle[row][col],
                 isGiven: true,
-                notes: [],
+                manualNotes: [],
+                autoNotes: [],
+                userEditedInAuto: [],
               };
             }
           }
         }
 
-        if (autoNotes) {
-          userGrid = updateAllAutoNotes(userGrid);
+        // If auto notes is enabled, initialize candidates for empty cells
+        if (autoNotesEnabled) {
+          for (let row = 0; row < 9; row++) {
+            for (let col = 0; col < 9; col++) {
+              if (userGrid[row][col].value === 0) {
+                userGrid[row][col].autoNotes = calculateAutoNotes(userGrid, row, col);
+              }
+            }
+          }
         }
 
         set({
@@ -730,26 +820,36 @@ export const useStore = create<Store>()(
           },
         }));
 
-        // If auto notes was just turned on, update the grid
+        // If auto notes was just turned on, initialize autoNotes for all empty cells
         if (key === 'autoNotes' && value === true) {
-          const currentState = get();
-          const newGrid = updateAllAutoNotes(currentState.game.userGrid);
-          set({
-            game: {
-              ...currentState.game,
-              userGrid: newGrid,
-            },
-          });
-        }
-        
-        // If auto notes was turned off, clear all notes from empty cells
-        if (key === 'autoNotes' && value === false) {
           const currentState = get();
           const newGrid = cloneGrid(currentState.game.userGrid);
           for (let row = 0; row < 9; row++) {
             for (let col = 0; col < 9; col++) {
               if (newGrid[row][col].value === 0) {
-                newGrid[row][col].notes = [];
+                const cell = newGrid[row][col];
+                const validCandidates = calculateAutoNotes(newGrid, row, col);
+                const userEdited = cell.userEditedInAuto;
+
+                if (userEdited.length > 0) {
+                  // Preserve user edits: start with calculated candidates,
+                  // then restore user-edited numbers to their previous state
+                  const previousAutoNotes = cell.autoNotes;
+                  // Remove user-edited numbers from calculated set
+                  const base = validCandidates.filter(n => !userEdited.includes(n));
+                  // Add back user-edited numbers that were in previous autoNotes
+                  for (const num of userEdited) {
+                    if (previousAutoNotes.includes(num)) {
+                      base.push(num);
+                    }
+                  }
+                  base.sort((a, b) => a - b);
+                  newGrid[row][col].autoNotes = base;
+                  // Keep userEditedInAuto preserved from cloneGrid
+                } else {
+                  // No user edits, just use calculated candidates
+                  newGrid[row][col].autoNotes = validCandidates;
+                }
               }
             }
           }
@@ -760,6 +860,8 @@ export const useStore = create<Store>()(
             },
           });
         }
+        // When turning off autoNotes, keep both layers as-is
+        // User can switch back and forth without losing either layer's data
       },
 
       resetStats: () => {

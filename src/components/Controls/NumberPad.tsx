@@ -47,17 +47,17 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
   }, [userGrid]);
 
   // In notes mode, don't fade any numbers since they can all be candidates
-  const isInNotesMode = isPencilMode && !autoNotes;
+  const isInNotesMode = isPencilMode;
 
   // Disable all inputs when paused or complete
   const isDisabled = isPaused || isComplete;
 
   const handleNumberClick = (num: number) => {
     if (!selectedCell || isDisabled) return;
-    
-    // When autoNotes is ON, always set numbers (notes are managed automatically)
-    // When autoNotes is OFF, respect isPencilMode
-    if (isPencilMode && !autoNotes) {
+
+    // In pencil mode, toggle notes (works with either layer based on autoNotes setting)
+    // In pen mode, set the number
+    if (isPencilMode) {
       toggleNote(num);
     } else {
       setNumber(num);
@@ -72,8 +72,6 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
   const handleTogglePencilMode = (e: React.MouseEvent) => {
     e.preventDefault();
     if (isDisabled) return;
-    // Don't allow toggling pencil mode when autoNotes is on
-    if (autoNotes) return;
     setIsPencilMode(!isPencilMode);
   };
 
@@ -99,9 +97,9 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
     setGameplaySetting('autoNotes', !autoNotes);
   };
 
-  // Notes button disabled when autoNotes is on
-  const notesDisabled = autoNotes || isDisabled;
-  const notesActive = isPencilMode && !autoNotes;
+  // Notes button allows toggling candidates in either layer
+  const notesDisabled = isDisabled;
+  const notesActive = isPencilMode;
 
   return (
     <div className={styles.numberPad}>
