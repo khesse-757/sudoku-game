@@ -148,6 +148,32 @@ const calculateAutoNotes = (grid: Cell[][], row: number, col: number): number[] 
   return possible;
 };
 
+// Check if placing a number at a position creates a conflict
+const hasConflictAt = (grid: Cell[][], row: number, col: number, value: number): boolean => {
+  if (value === 0) return false;
+
+  // Check row
+  for (let c = 0; c < 9; c++) {
+    if (c !== col && grid[row][c].value === value) return true;
+  }
+
+  // Check column
+  for (let r = 0; r < 9; r++) {
+    if (r !== row && grid[r][col].value === value) return true;
+  }
+
+  // Check 3x3 box
+  const boxRow = Math.floor(row / 3) * 3;
+  const boxCol = Math.floor(col / 3) * 3;
+  for (let r = boxRow; r < boxRow + 3; r++) {
+    for (let c = boxCol; c < boxCol + 3; c++) {
+      if ((r !== row || c !== col) && grid[r][c].value === value) return true;
+    }
+  }
+
+  return false;
+};
+
 // Update all auto notes in the grid
 const updateAllAutoNotes = (grid: Cell[][]): Cell[][] => {
   const newGrid = cloneGrid(grid);
@@ -280,10 +306,10 @@ export const useStore = create<Store>()(
           newGrid = updateAllAutoNotes(newGrid);
         }
 
-        // Check if the number is wrong
+        // Check if the number creates a conflict (duplicate in row, column, or box)
         let newMistakes = state.game.mistakes;
-        if (num !== 0 && num !== solution[row][col]) {
-        newMistakes++;
+        if (hasConflictAt(newGrid, row, col, num)) {
+          newMistakes++;
         }
 
         // Check for win

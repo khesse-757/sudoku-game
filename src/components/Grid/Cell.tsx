@@ -25,7 +25,6 @@ interface CellProps {
 const Cell = ({ value, notes, isGiven, isSelected, row, col, onClick }: CellProps) => {
   const selectedCell = useStore((state) => state.game.selectedCell);
   const userGrid = useStore((state) => state.game.userGrid);
-  const solution = useStore((state) => state.game.solution);
   const gameplay = useStore((state) => state.settings.gameplay) ?? defaultGameplay;
   const getConflicts = useStore((state) => state.getConflicts);
 
@@ -65,18 +64,19 @@ const Cell = ({ value, notes, isGiven, isSelected, row, col, onClick }: CellProp
 
   const isHighlighted = isInRowOrColumn || isInBox;
 
-  // Check if this is a mistake (wrong number)
-  const isMistake = gameplay.autoCheckMistakes && 
-    value !== 0 && 
-    !isGiven && 
-    value !== solution[row][col];
+  // Check if this cell has conflicts (duplicates in row, column, or box)
+  const cellConflicts = getConflicts ? getConflicts(row, col) : [];
+  const hasConflict = gameplay.autoCheckMistakes &&
+    value !== 0 &&
+    !isGiven &&
+    cellConflicts.length > 0;
 
-  // Check for conflicts
-  let hasConflict = false;
+  // Also highlight cells that conflict with the selected cell
+  let conflictsWithSelected = false;
   if (gameplay.highlightConflicts && selectedCell) {
     const [selRow, selCol] = selectedCell;
-    const conflicts = getConflicts ? getConflicts(selRow, selCol) : [];
-    hasConflict = conflicts.some(([r, c]) => r === row && c === col);
+    const selectedConflicts = getConflicts ? getConflicts(selRow, selCol) : [];
+    conflictsWithSelected = selectedConflicts.some(([r, c]) => r === row && c === col);
   }
 
   // Determine if this cell has thick borders (3x3 grid lines)
@@ -96,9 +96,9 @@ const Cell = ({ value, notes, isGiven, isSelected, row, col, onClick }: CellProp
     isIdentical && isGiven && styles.givenIdentical,
     // Selected (highest priority)
     isSelected && styles.selected,
-    // Error states
-    isMistake && styles.mistake,
-    hasConflict && styles.conflict,
+    // Error states (conflicts with other cells)
+    hasConflict && styles.mistake,
+    conflictsWithSelected && styles.conflict,
     // Borders
     hasRightBorder && styles.rightBorder,
     hasBottomBorder && styles.bottomBorder,
