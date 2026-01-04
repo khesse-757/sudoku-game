@@ -327,6 +327,30 @@
   }
 }
 
+/* Short screens (iPhone in Safari with address bar) */
+@media (max-height: 700px) {
+  .header {
+    padding: 0.5rem 1rem;
+    height: 48px;
+  }
+
+  .title {
+    font-size: 0.9rem;
+  }
+
+  .gameInfoBar {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .gridContainer {
+    padding: 0 0.5rem 0.5rem;
+  }
+
+  .controls {
+    padding: 0.5rem;
+  }
+}
+
 /* Landscape mode */
 @media (max-height: 600px) and (orientation: landscape) {
   .header {

@@ -190,13 +190,20 @@
 .mobilePad {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .mobileRow {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 0.5rem;
+  gap: 0.4rem;
+}
+
+/* Override aspect-ratio on mobile for better fit */
+.mobilePad .numberButton {
+  aspect-ratio: unset;
+  padding: 0.6rem 0.5rem;
+  min-height: 44px;
 }
 
 .mobileActionsRow {
@@ -381,27 +388,56 @@
 /* Small mobile */
 @media (max-width: 400px) {
   .mobilePad {
-    gap: 0.4rem;
+    gap: 0.35rem;
   }
 
   .mobileRow {
-    gap: 0.4rem;
+    gap: 0.35rem;
   }
 
-  .numberButton {
-    padding: 0.75rem;
+  .mobilePad .numberButton {
+    padding: 0.5rem 0.4rem;
     font-size: 1.25rem;
     border-radius: 3px;
+    min-height: 40px;
   }
 
   .mobileActionsRow {
-    gap: 0.4rem;
-    padding-top: 0.4rem;
+    gap: 0.35rem;
+    padding-top: 0.35rem;
   }
 
   .mobileActionButton {
-    padding: 0.4rem 0.2rem;
+    padding: 0.35rem 0.2rem;
     font-size: 0.55rem;
+  }
+}
+
+/* Short screens (iPhone SE, iPhone 14 in Safari with address bar) */
+@media (max-height: 700px) {
+  .mobilePad {
+    gap: 0.3rem;
+  }
+
+  .mobileRow {
+    gap: 0.3rem;
+  }
+
+  .mobilePad .numberButton {
+    padding: 0.4rem 0.3rem;
+    font-size: 1.1rem;
+    min-height: 36px;
+  }
+
+  .mobileActionsRow {
+    gap: 0.3rem;
+    padding-top: 0.3rem;
+  }
+
+  .mobileActionButton {
+    padding: 0.3rem 0.15rem;
+    font-size: 0.5rem;
+    gap: 0.1rem;
   }
 }
 
