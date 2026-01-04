@@ -52,7 +52,7 @@
 /* Action buttons row */
 .actions {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
@@ -92,6 +92,19 @@
   background-color: var(--color-primary);
   color: var(--color-background);
   border-color: var(--color-primary);
+}
+
+/* Auto button - green/success hover and active state */
+.autoButton:hover:not(:disabled) {
+  background-color: var(--color-success, var(--color-primary));
+  color: var(--color-background);
+  border-color: var(--color-success, var(--color-primary));
+}
+
+.autoButton.active {
+  background-color: var(--color-success, var(--color-primary));
+  color: var(--color-background);
+  border-color: var(--color-success, var(--color-primary));
 }
 
 /* Erase button - red/error hover */
@@ -149,12 +162,14 @@
 
 .mobileRow {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 0.5rem;
 }
 
-.mobileRow:first-child {
-  grid-template-columns: repeat(5, 1fr);
+.mobileRowWithActions {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
 }
 
 .mobileSecondaryRow {
@@ -214,7 +229,7 @@
     color: var(--color-text);
     border-color: var(--color-border);
   }
-  
+
   /* Notes button active MUST win over hover - use high specificity */
   .notesButton.active,
   .notesButton.active:hover,
@@ -223,7 +238,23 @@
     color: var(--color-background);
     border-color: var(--color-primary);
   }
-  
+
+  /* Auto button - disable hover */
+  .autoButton:hover:not(:disabled) {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+  }
+
+  /* Auto button active MUST win over hover - use high specificity */
+  .autoButton.active,
+  .autoButton.active:hover,
+  .autoButton.active:focus {
+    background-color: var(--color-success, var(--color-primary));
+    color: var(--color-background);
+    border-color: var(--color-success, var(--color-primary));
+  }
+
   /* Tap feedback */
   .numberButton:active:not(:disabled) {
     background-color: var(--color-primary);
@@ -236,6 +267,12 @@
     background-color: var(--color-error);
     color: var(--color-background);
     border-color: var(--color-error);
+  }
+
+  .autoButton:active:not(:disabled) {
+    background-color: var(--color-success, var(--color-primary));
+    color: var(--color-background);
+    border-color: var(--color-success, var(--color-primary));
   }
 }
 

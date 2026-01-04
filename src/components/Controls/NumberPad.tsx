@@ -1,5 +1,5 @@
 import { useStore } from '../../store';
-import { Eraser, Edit3, RotateCcw, RefreshCw } from 'lucide-react';
+import { Eraser, Edit3, RotateCcw, RefreshCw, Wand2 } from 'lucide-react';
 import styles from './NumberPad.module.css';
 
 interface NumberPadProps {
@@ -19,7 +19,8 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
   const canUndo = useStore((state) => state.canUndo());
   const canRedo = useStore((state) => state.canRedo());
   const resetPuzzle = useStore((state) => state.resetPuzzle);
-  
+  const setGameplaySetting = useStore((state) => state.setGameplaySetting);
+
   // Get autoNotes setting - when enabled, always enter numbers (notes are automatic)
   const autoNotes = useStore((state) => state.settings.gameplay?.autoNotes ?? false);
 
@@ -67,6 +68,12 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
     }
   };
 
+  const handleToggleAutoNotes = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isDisabled) return;
+    setGameplaySetting('autoNotes', !autoNotes);
+  };
+
   // Notes button disabled when autoNotes is on
   const notesDisabled = autoNotes || isDisabled;
   const notesActive = isPencilMode && !autoNotes;
@@ -97,7 +104,17 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
             title={autoNotes ? 'Notes are automatic' : 'Toggle notes mode'}
           >
             <Edit3 size={20} />
-            <span>{autoNotes ? 'Auto' : 'Notes'}</span>
+            <span>Notes</span>
+          </button>
+          <button
+            onClick={handleToggleAutoNotes}
+            onMouseDown={(e) => e.preventDefault()}
+            className={`${styles.actionButton} ${styles.autoButton} ${autoNotes ? styles.active : ''}`}
+            disabled={isDisabled}
+            title={autoNotes ? 'Auto notes on' : 'Auto notes off'}
+          >
+            <Wand2 size={20} />
+            <span>Auto</span>
           </button>
           <button
             onClick={handleClear}
@@ -154,7 +171,7 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
             </button>
           ))}
         </div>
-        <div className={styles.mobileRow}>
+        <div className={styles.mobileRowWithActions}>
           {[6, 7, 8, 9].map((num) => (
             <button
               key={num}
@@ -173,6 +190,14 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
             disabled={notesDisabled}
           >
             <Edit3 size={18} />
+          </button>
+          <button
+            onClick={handleToggleAutoNotes}
+            onMouseDown={(e) => e.preventDefault()}
+            className={`${styles.numberButton} ${styles.actionButton} ${styles.autoButton} ${autoNotes ? styles.active : ''}`}
+            disabled={isDisabled}
+          >
+            <Wand2 size={18} />
           </button>
           <button
             onClick={handleClear}
