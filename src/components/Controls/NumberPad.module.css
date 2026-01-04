@@ -49,6 +49,15 @@
   cursor: not-allowed;
 }
 
+/* Faded state for numbers with all 9 instances placed */
+.numberButton.completed {
+  opacity: 0.35;
+}
+
+.numberButton.completed:hover:not(:disabled) {
+  opacity: 0.6;
+}
+
 /* Action buttons row */
 .actions {
   display: grid;

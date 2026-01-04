@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useStore } from '../../store';
 import { Eraser, Edit3, RotateCcw, RefreshCw, Wand2 } from 'lucide-react';
 import styles from './NumberPad.module.css';
@@ -20,9 +21,33 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
   const canRedo = useStore((state) => state.canRedo());
   const resetPuzzle = useStore((state) => state.resetPuzzle);
   const setGameplaySetting = useStore((state) => state.setGameplaySetting);
+  const userGrid = useStore((state) => state.game.userGrid);
 
   // Get autoNotes setting - when enabled, always enter numbers (notes are automatic)
   const autoNotes = useStore((state) => state.settings.gameplay?.autoNotes ?? false);
+
+  // Count occurrences of each number to determine which are complete (9 instances)
+  const completedNumbers = useMemo(() => {
+    const counts: Record<number, number> = {};
+    for (let i = 1; i <= 9; i++) counts[i] = 0;
+
+    for (const row of userGrid) {
+      for (const cell of row) {
+        if (cell.value >= 1 && cell.value <= 9) {
+          counts[cell.value]++;
+        }
+      }
+    }
+
+    const completed = new Set<number>();
+    for (let i = 1; i <= 9; i++) {
+      if (counts[i] >= 9) completed.add(i);
+    }
+    return completed;
+  }, [userGrid]);
+
+  // In notes mode, don't fade any numbers since they can all be candidates
+  const isInNotesMode = isPencilMode && !autoNotes;
 
   // Disable all inputs when paused or complete
   const isDisabled = isPaused || isComplete;
@@ -83,17 +108,20 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
       {/* Desktop: 3x3 grid with buttons */}
       <div className={styles.desktopPad}>
         <div className={styles.numbers}>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-            <button
-              key={num}
-              onClick={() => handleNumberClick(num)}
-              onMouseDown={(e) => e.preventDefault()}
-              className={styles.numberButton}
-              disabled={!selectedCell || isDisabled}
-            >
-              {num}
-            </button>
-          ))}
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => {
+            const isCompleted = !isInNotesMode && completedNumbers.has(num);
+            return (
+              <button
+                key={num}
+                onClick={() => handleNumberClick(num)}
+                onMouseDown={(e) => e.preventDefault()}
+                className={`${styles.numberButton} ${isCompleted ? styles.completed : ''}`}
+                disabled={!selectedCell || isDisabled}
+              >
+                {num}
+              </button>
+            );
+          })}
         </div>
         <div className={styles.actions}>
           <button
@@ -159,30 +187,36 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
       {/* Mobile: Row 1 (1-5), Row 2 (6-9 + erase), Row 3 (notes + auto + undo + redo + reset) */}
       <div className={styles.mobilePad}>
         <div className={styles.mobileRow}>
-          {[1, 2, 3, 4, 5].map((num) => (
-            <button
-              key={num}
-              onClick={() => handleNumberClick(num)}
-              onMouseDown={(e) => e.preventDefault()}
-              className={styles.numberButton}
-              disabled={!selectedCell || isDisabled}
-            >
-              {num}
-            </button>
-          ))}
+          {[1, 2, 3, 4, 5].map((num) => {
+            const isCompleted = !isInNotesMode && completedNumbers.has(num);
+            return (
+              <button
+                key={num}
+                onClick={() => handleNumberClick(num)}
+                onMouseDown={(e) => e.preventDefault()}
+                className={`${styles.numberButton} ${isCompleted ? styles.completed : ''}`}
+                disabled={!selectedCell || isDisabled}
+              >
+                {num}
+              </button>
+            );
+          })}
         </div>
         <div className={styles.mobileRow}>
-          {[6, 7, 8, 9].map((num) => (
-            <button
-              key={num}
-              onClick={() => handleNumberClick(num)}
-              onMouseDown={(e) => e.preventDefault()}
-              className={styles.numberButton}
-              disabled={!selectedCell || isDisabled}
-            >
-              {num}
-            </button>
-          ))}
+          {[6, 7, 8, 9].map((num) => {
+            const isCompleted = !isInNotesMode && completedNumbers.has(num);
+            return (
+              <button
+                key={num}
+                onClick={() => handleNumberClick(num)}
+                onMouseDown={(e) => e.preventDefault()}
+                className={`${styles.numberButton} ${isCompleted ? styles.completed : ''}`}
+                disabled={!selectedCell || isDisabled}
+              >
+                {num}
+              </button>
+            );
+          })}
           <button
             onClick={handleClear}
             onMouseDown={(e) => e.preventDefault()}
