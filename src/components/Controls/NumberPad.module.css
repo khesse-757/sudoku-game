@@ -166,31 +166,26 @@
   gap: 0.5rem;
 }
 
-.mobileRowWithActions {
+.mobileActionsRow {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.5rem;
-}
-
-.mobileSecondaryRow {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--color-border);
 }
 
-.mobileSecondaryButton {
+.mobileActionButton {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
-  padding: 0.5rem;
-  background-color: transparent;
+  gap: 0.2rem;
+  padding: 0.5rem 0.25rem;
+  background-color: var(--color-surface);
   color: var(--color-text-dim);
   border: 1px solid var(--color-border);
   font-family: var(--font-family);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
@@ -199,7 +194,12 @@
   border-radius: 4px;
 }
 
-.mobileSecondaryButton:disabled {
+.mobileActionButton:hover:not(:disabled) {
+  color: var(--color-text);
+  border-color: var(--color-primary);
+}
+
+.mobileActionButton:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
@@ -209,9 +209,9 @@
   /* Disable hover effects on touch - they cause sticky states */
   .numberButton:hover:not(:disabled),
   .secondaryButton:hover:not(:disabled),
-  .mobileSecondaryButton:hover:not(:disabled) {
+  .mobileActionButton:hover:not(:disabled) {
     background-color: var(--color-surface);
-    color: var(--color-text);
+    color: var(--color-text-dim);
     border-color: var(--color-border);
     transform: none;
   }
@@ -361,14 +361,14 @@
     border-radius: 3px;
   }
 
-  .mobileSecondaryRow {
+  .mobileActionsRow {
     gap: 0.4rem;
     padding-top: 0.4rem;
   }
 
-  .mobileSecondaryButton {
-    padding: 0.4rem;
-    font-size: 0.6rem;
+  .mobileActionButton {
+    padding: 0.4rem 0.2rem;
+    font-size: 0.55rem;
   }
 }
 
@@ -387,13 +387,13 @@
     gap: 0.4rem;
   }
 
-  .mobileSecondaryRow {
+  .mobileActionsRow {
     gap: 0.4rem;
     padding-top: 0.4rem;
   }
 
-  .mobileSecondaryButton {
-    padding: 0.4rem;
-    font-size: 0.55rem;
+  .mobileActionButton {
+    padding: 0.4rem 0.2rem;
+    font-size: 0.5rem;
   }
 }

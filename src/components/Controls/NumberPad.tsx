@@ -156,7 +156,7 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
         </div>
       </div>
 
-      {/* Mobile: Row 1 (1-5), Row 2 (6-9 + notes + erase), Row 3 (undo + redo + reset) */}
+      {/* Mobile: Row 1 (1-5), Row 2 (6-9 + erase), Row 3 (notes + auto + undo + redo + reset) */}
       <div className={styles.mobilePad}>
         <div className={styles.mobileRow}>
           {[1, 2, 3, 4, 5].map((num) => (
@@ -171,7 +171,7 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
             </button>
           ))}
         </div>
-        <div className={styles.mobileRowWithActions}>
+        <div className={styles.mobileRow}>
           {[6, 7, 8, 9].map((num) => (
             <button
               key={num}
@@ -184,22 +184,6 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
             </button>
           ))}
           <button
-            onClick={handleTogglePencilMode}
-            onMouseDown={(e) => e.preventDefault()}
-            className={`${styles.numberButton} ${styles.actionButton} ${styles.notesButton} ${notesActive ? styles.active : ''}`}
-            disabled={notesDisabled}
-          >
-            <Edit3 size={18} />
-          </button>
-          <button
-            onClick={handleToggleAutoNotes}
-            onMouseDown={(e) => e.preventDefault()}
-            className={`${styles.numberButton} ${styles.actionButton} ${styles.autoButton} ${autoNotes ? styles.active : ''}`}
-            disabled={isDisabled}
-          >
-            <Wand2 size={18} />
-          </button>
-          <button
             onClick={handleClear}
             onMouseDown={(e) => e.preventDefault()}
             className={`${styles.numberButton} ${styles.actionButton} ${styles.eraseButton}`}
@@ -208,31 +192,49 @@ const NumberPad = ({ isPencilMode, setIsPencilMode }: NumberPadProps) => {
             <Eraser size={18} />
           </button>
         </div>
-        <div className={styles.mobileSecondaryRow}>
+        <div className={styles.mobileActionsRow}>
+          <button
+            onClick={handleTogglePencilMode}
+            onMouseDown={(e) => e.preventDefault()}
+            className={`${styles.mobileActionButton} ${styles.notesButton} ${notesActive ? styles.active : ''}`}
+            disabled={notesDisabled}
+          >
+            <Edit3 size={16} />
+            <span>Notes</span>
+          </button>
+          <button
+            onClick={handleToggleAutoNotes}
+            onMouseDown={(e) => e.preventDefault()}
+            className={`${styles.mobileActionButton} ${styles.autoButton} ${autoNotes ? styles.active : ''}`}
+            disabled={isDisabled}
+          >
+            <Wand2 size={16} />
+            <span>Auto</span>
+          </button>
           <button
             onClick={handleUndo}
             onMouseDown={(e) => e.preventDefault()}
-            className={styles.mobileSecondaryButton}
+            className={styles.mobileActionButton}
             disabled={!canUndo || isDisabled}
           >
-            <RotateCcw size={14} />
+            <RotateCcw size={16} />
             <span>Undo</span>
           </button>
           <button
             onClick={handleRedo}
             onMouseDown={(e) => e.preventDefault()}
-            className={styles.mobileSecondaryButton}
+            className={styles.mobileActionButton}
             disabled={!canRedo || isDisabled}
           >
-            <RotateCcw size={14} style={{ transform: 'scaleX(-1)' }} />
+            <RotateCcw size={16} style={{ transform: 'scaleX(-1)' }} />
             <span>Redo</span>
           </button>
           <button
             onClick={handleReset}
             onMouseDown={(e) => e.preventDefault()}
-            className={styles.mobileSecondaryButton}
+            className={styles.mobileActionButton}
           >
-            <RefreshCw size={14} />
+            <RefreshCw size={16} />
             <span>Reset</span>
           </button>
         </div>
